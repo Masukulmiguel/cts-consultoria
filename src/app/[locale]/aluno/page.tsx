@@ -1,9 +1,10 @@
 import { signOutAction } from '@/actions/auth-signout';
+import { NotificationList } from '@/components/enrollment/notification-list';
 import type { Locale } from '@/i18n/routing';
 import { auth } from '@/lib/auth';
 import { legacyStatusToNew } from '@/lib/enrollment-status-legacy';
 import { prisma } from '@/lib/prisma';
-import { Award, BookOpen, CalendarCheck, FileText, LogOut } from 'lucide-react';
+import { ArrowRight, Award, BookOpen, CalendarCheck, FileText, LogOut } from 'lucide-react';
 import { setRequestLocale } from 'next-intl/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -24,6 +25,8 @@ const STATUS: Record<string, { label: string; className: string }> = {
   REJECTED: { label: 'Inscrição recusada', className: 'bg-error-bg text-error' },
   CANCELLED: { label: 'Inscrição cancelada', className: 'bg-error-bg text-error' },
 };
+
+const ESTADOS_COM_WIZARD = new Set(['DRAFT', 'PENDING_DOCUMENTS', 'CORRECTION_REQUIRED']);
 
 export default async function StudentAreaPage({
   params,
@@ -53,6 +56,13 @@ export default async function StudentAreaPage({
     orderBy: { createdAt: 'desc' },
   });
 
+  const notifications = await prisma.notification.findMany({
+    where: { userId, read: false },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+    select: { id: true, kind: true, title: true, body: true, href: true, createdAt: true },
+  });
+
   return (
     <div className="min-h-screen bg-surface-muted">
       <div className="on-dark bg-ink">
@@ -80,6 +90,17 @@ export default async function StudentAreaPage({
       </div>
 
       <div className="shell py-14">
+        <NotificationList
+          notifications={notifications.map((notification) => ({
+            id: notification.id,
+            kind: notification.kind,
+            title: notification.title,
+            body: notification.body,
+            href: notification.href,
+            createdAt: notification.createdAt.toISOString(),
+          }))}
+        />
+
         {enrollments.length === 0 ? (
           <div className="card mx-auto max-w-xl p-9 text-center">
             <span className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary-50 text-primary-700">
@@ -100,9 +121,11 @@ export default async function StudentAreaPage({
         ) : (
           <div className="space-y-8">
             {enrollments.map((enrollment) => {
-              const status = STATUS[legacyStatusToNew(enrollment.status)] ?? STATUS.DRAFT;
+              const canonical = legacyStatusToNew(enrollment.status);
+              const status = STATUS[canonical] ?? STATUS.DRAFT;
               const present = enrollment.attendances.filter((item) => item.present).length;
               const progress = Math.min(Math.max(enrollment.progress, 0), 100);
+              const temWizard = ESTADOS_COM_WIZARD.has(canonical);
 
               return (
                 <article key={enrollment.id} className="card overflow-hidden">
@@ -127,6 +150,16 @@ export default async function StudentAreaPage({
                       <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
                         {enrollment.course.summary}
                       </p>
+
+                      {temWizard ? (
+                        <Link
+                          href={`/${locale}/aluno/inscricao/${enrollment.id}`}
+                          className="btn-primary mt-5 inline-flex items-center gap-2"
+                        >
+                          {isPt ? 'Continuar inscrição' : 'Continue enrolment'}
+                          <ArrowRight size={15} />
+                        </Link>
+                      ) : null}
 
                       <div className="mt-7">
                         <div className="flex items-center justify-between text-xs font-semibold text-ink-muted">
