@@ -1,6 +1,7 @@
 import { signOutAction } from '@/actions/auth-signout';
 import type { Locale } from '@/i18n/routing';
 import { auth } from '@/lib/auth';
+import { legacyStatusToNew } from '@/lib/enrollment-status-legacy';
 import { prisma } from '@/lib/prisma';
 import { Award, BookOpen, CalendarCheck, FileText, LogOut } from 'lucide-react';
 import { setRequestLocale } from 'next-intl/server';
@@ -10,11 +11,18 @@ import { redirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 
 const STATUS: Record<string, { label: string; className: string }> = {
-  PENDING: { label: 'Aguarda pagamento', className: 'bg-warning-bg text-warning' },
-  PAID: { label: 'Pago', className: 'bg-info-bg text-info' },
-  CONFIRMED: { label: 'Confirmada', className: 'bg-success-bg text-success' },
-  COMPLETED: { label: 'Concluída', className: 'bg-success-bg text-success' },
-  CANCELLED: { label: 'Cancelada', className: 'bg-error-bg text-error' },
+  DRAFT: { label: 'Inscrição iniciada', className: 'bg-surface-subtle text-ink-secondary' },
+  PENDING_DOCUMENTS: { label: 'A aguardar documentos', className: 'bg-warning-bg text-warning' },
+  SUBMITTED: { label: 'Submetida para validação', className: 'bg-info-bg text-info' },
+  UNDER_REVIEW: { label: 'Em validação', className: 'bg-info-bg text-info' },
+  CORRECTION_REQUIRED: { label: 'Correcções solicitadas', className: 'bg-warning-bg text-warning' },
+  PAYMENT_PENDING_VERIFICATION: {
+    label: 'Aguarda confirmação de pagamento',
+    className: 'bg-warning-bg text-warning',
+  },
+  APPROVED: { label: 'Inscrição aprovada', className: 'bg-success-bg text-success' },
+  REJECTED: { label: 'Inscrição recusada', className: 'bg-error-bg text-error' },
+  CANCELLED: { label: 'Inscrição cancelada', className: 'bg-error-bg text-error' },
 };
 
 export default async function StudentAreaPage({
@@ -92,7 +100,7 @@ export default async function StudentAreaPage({
         ) : (
           <div className="space-y-8">
             {enrollments.map((enrollment) => {
-              const status = STATUS[enrollment.status] ?? STATUS.PENDING;
+              const status = STATUS[legacyStatusToNew(enrollment.status)] ?? STATUS.DRAFT;
               const present = enrollment.attendances.filter((item) => item.present).length;
               const progress = Math.min(Math.max(enrollment.progress, 0), 100);
 

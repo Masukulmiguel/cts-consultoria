@@ -32,12 +32,17 @@ beforeEach(() => {
 });
 
 describe('enrollInCourse', () => {
-  it('cria a inscrição pendente e leva o formando à área do aluno', async () => {
+  it('cria a inscrição no passo 1 do wizard e leva o formando à área do aluno', async () => {
     const result = await enrollInCourse(null, formData({ courseId: 'c1', locale: 'pt' }));
 
     expect(prismaMock.enrollment.upsert).toHaveBeenCalledTimes(1);
     const args = prismaMock.enrollment.upsert.mock.calls[0][0];
-    expect(args.create).toMatchObject({ userId: 'u1', courseId: 'c1', status: 'PENDING' });
+    expect(args.create).toMatchObject({
+      userId: 'u1',
+      courseId: 'c1',
+      status: 'DRAFT',
+      currentStep: 1,
+    });
     expect(redirectMock).toHaveBeenCalledWith('/pt/aluno');
     expect(result).toEqual({ status: 'ok' });
   });

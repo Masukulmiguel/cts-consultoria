@@ -1,6 +1,7 @@
 import type { Locale } from '@/i18n/routing';
 import { listRows } from '@/lib/admin/content-repo';
 import { RESOURCES, isResourceKey } from '@/lib/admin/resources';
+import { legacyStatusToNew } from '@/lib/enrollment-status-legacy';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -28,13 +29,17 @@ export default async function ResourceListPage({
     }
     if (column === 'status') {
       const labels: Record<string, string> = {
-        PENDING: 'Aguarda pagamento',
-        PAID: 'Pago',
-        CONFIRMED: 'Confirmada',
-        COMPLETED: 'Concluída',
-        CANCELLED: 'Cancelada',
+        DRAFT: 'Inscrição iniciada',
+        PENDING_DOCUMENTS: 'A aguardar documentos',
+        SUBMITTED: 'Submetida para validação',
+        UNDER_REVIEW: 'Em validação',
+        CORRECTION_REQUIRED: 'Correcções solicitadas',
+        PAYMENT_PENDING_VERIFICATION: 'Aguarda confirmação de pagamento',
+        APPROVED: 'Inscrição aprovada',
+        REJECTED: 'Inscrição recusada',
+        CANCELLED: 'Inscrição cancelada',
       };
-      const value = String(row.status ?? '');
+      const value = legacyStatusToNew(String(row.status ?? ''));
       return labels[value] ?? value;
     }
     if (column === 'progress') return `${String(row.progress ?? 0)}%`;

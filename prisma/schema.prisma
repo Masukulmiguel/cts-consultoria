@@ -44,6 +44,12 @@ model User {
   auditLogs     AuditLog[]
   handledMessages ContactMessage[]
   enrollments   Enrollment[]
+  studentProfile StudentProfile?
+  notifications Notification[]
+  reviewedDocuments EnrollmentDocument[]
+  reviewedPayments PaymentSubmission[]
+  statusHistory EnrollmentStatusHistory[]
+  updatedSettings Setting[]
 
   @@index([role])
 }
@@ -162,7 +168,9 @@ model Enrollment {
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   courseId  String
   course    Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  status    EnrollmentStatus @default(PENDING)
+  status    EnrollmentStatus @default(DRAFT)
+  currentStep Int            @default(1)
+  submittedAt DateTime?
   progress  Int              @default(0)
   notes     String?
   createdAt DateTime         @default(now())
@@ -170,18 +178,171 @@ model Enrollment {
 
   attendances  Attendance[]
   certificates Certificate[]
+  documents    EnrollmentDocument[]
+  paymentSubmission PaymentSubmission?
+  statusHistory EnrollmentStatusHistory[]
 
   @@unique([userId, courseId])
   @@index([status])
   @@index([userId])
+  @@index([submittedAt])
 }
 
+/// Estados canónicos do wizard de inscrição + os 4 estados legados mantidos.
+/// Os legados existem para compatibilidade com as linhas já gravadas e são
+/// normalizados em leitura por `legacyStatusToNew` (src/lib/enrollment-status-legacy.ts).
 enum EnrollmentStatus {
-  PENDING
-  PAID
-  CONFIRMED
-  COMPLETED
+  DRAFT
+  PENDING_DOCUMENTS
+  SUBMITTED
+  UNDER_REVIEW
+  CORRECTION_REQUIRED
+  PAYMENT_PENDING_VERIFICATION
+  APPROVED
+  REJECTED
   CANCELLED
+  /// Legado: converter para PAYMENT_PENDING_VERIFICATION.
+  PENDING
+  /// Legado: converter para PAYMENT_PENDING_VERIFICATION.
+  PAID
+  /// Legado: converter para APPROVED.
+  CONFIRMED
+  /// Legado: converter para APPROVED.
+  COMPLETED
+}
+
+/// Estado do processamento OCR (consultivo, nunca aprova documentos).
+enum OcrStatus {
+  NOT_RUN
+  RUNNING
+  DONE
+  FAILED
+}
+
+/// Tipo de documento carregado pelo formando.
+enum DocumentKind {
+  BI_FRONT
+  BI_BACK
+  PHOTO
+  PROOF
+}
+
+/// Estado da revisão humana de um documento ou comprovativo.
+enum DocumentReviewStatus {
+  PENDING
+  MATCHED
+  DIVERGENT
+  NOT_READABLE
+  APPROVED
+  REJECTED
+}
+
+/// Método de pagamento declarado pelo formando.
+enum PaymentMethod {
+  EXPRESS
+  BANK_TRANSFER
+}
+
+/// Perfil de dados pessoais do formando (1:1 com User).
+model StudentProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nif         String?
+  biNumber    String?
+  birthDate   DateTime?
+  address     String?
+  municipality String?
+  province    String?
+  phone       String?
+  primaryDocumentType String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+/// Documento carregado pelo formando (BI frente/verso, fotografia, comprovativo).
+model EnrollmentDocument {
+  id             String               @id @default(cuid())
+  enrollmentId   String
+  enrollment     Enrollment           @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  kind           DocumentKind
+  storageKey     String               @unique
+  mimeType       String
+  byteSize       Int
+  sha256         String
+  ocrStatus      OcrStatus            @default(NOT_RUN)
+  ocrRaw         Json?
+  ocrConfidence  Float?
+  ocrSource      String?
+  reviewStatus   DocumentReviewStatus @default(PENDING)
+  reviewedBy     User?                @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedById   String?
+  rejectionReason String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@unique([enrollmentId, kind])
+  @@index([enrollmentId])
+}
+
+/// Comprovativo de pagamento submetido pelo formando (1:1 com Enrollment).
+model PaymentSubmission {
+  id                String               @id @default(cuid())
+  enrollmentId      String               @unique
+  enrollment        Enrollment           @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  method            PaymentMethod
+  amount            Decimal              @db.Decimal(12, 2)
+  currency          String               @default("AOA")
+  reference         String?
+  ocrExtract        Json?
+  ocrStatus         OcrStatus            @default(NOT_RUN)
+  duplicateCheckHash String?             @unique
+  reviewStatus      DocumentReviewStatus @default(PENDING)
+  reviewedBy        User?                @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedById      String?
+  rejectionReason   String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+}
+
+/// Histórico de alterações de estado de uma inscrição.
+model EnrollmentStatusHistory {
+  id           String           @id @default(cuid())
+  enrollmentId String
+  enrollment   Enrollment       @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  fromStatus   EnrollmentStatus?
+  toStatus     EnrollmentStatus
+  actorUserId  String?
+  actor        User?            @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorRole    String?
+  reason       String?
+  createdAt    DateTime         @default(now())
+
+  @@index([enrollmentId, createdAt])
+}
+
+/// Configuração da aplicação (dados de pagamento, instruções, etc.).
+model Setting {
+  key       String   @id
+  value     Json
+  updatedBy String?
+  user      User?    @relation(fields: [updatedBy], references: [id], onDelete: SetNull)
+  updatedAt DateTime @updatedAt
+}
+
+/// Notificação interna para o utilizador.
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String
+  title     String
+  body      String
+  href      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read, createdAt])
 }
 
 /// Material de apoio de um curso (apenas leitura pelo formando).

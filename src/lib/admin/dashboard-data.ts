@@ -70,11 +70,11 @@ export async function getDashboardData(): Promise<DashboardData> {
       { name: 'Email', value: 5.8, color: '#c445a8' },
     ],
     enrollments: [
-      { name: 'Aprovadas', value: 42, color: '#16a36a' },
-      { name: 'Em análise', value: 28, color: '#2e7be8' },
-      { name: 'A aguardar pagamento', value: 16, color: '#e2912b' },
-      { name: 'Rejeitadas', value: 11, color: '#e41620' },
-      { name: 'Canceladas', value: 5, color: '#6b7794' },
+      { name: 'Inscrição aprovada', value: 42, color: '#16a36a' },
+      { name: 'Em validação', value: 28, color: '#2e7be8' },
+      { name: 'Aguarda confirmação de pagamento', value: 16, color: '#e2912b' },
+      { name: 'Inscrição recusada', value: 11, color: '#e41620' },
+      { name: 'Inscrição cancelada', value: 5, color: '#6b7794' },
     ],
     kpis: [
       {

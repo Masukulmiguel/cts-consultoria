@@ -141,7 +141,7 @@ export async function registerStudent(
 
 /**
  * Confirma a inscrição do formando numa formação publicada.
- * A inscrição nasce em PENDING (aguarda pagamento validado pelo admin).
+ * A inscrição nasce em DRAFT, no passo 1 do wizard (aguarda os documentos).
  */
 export async function enrollInCourse(
   _prev: RegistrationState,
@@ -172,7 +172,7 @@ export async function enrollInCourse(
   await prisma.enrollment.upsert({
     where: { userId_courseId: { userId, courseId } },
     update: {},
-    create: { userId, courseId, status: 'PENDING' },
+    create: { userId, courseId, status: 'DRAFT', currentStep: 1 },
   });
 
   await audit({

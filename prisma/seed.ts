@@ -189,11 +189,11 @@ async function seedStudent() {
 
   const enrollment = await prisma.enrollment.upsert({
     where: { userId_courseId: { userId: student.id, courseId: course.id } },
-    update: { status: 'CONFIRMED', progress: 65 },
+    update: { status: 'APPROVED', progress: 65 },
     create: {
       userId: student.id,
       courseId: course.id,
-      status: 'CONFIRMED',
+      status: 'APPROVED',
       progress: 65,
     },
   });
