@@ -129,7 +129,7 @@ function hasApprovedDocuments(documents: readonly DocumentLike[]): boolean {
   );
 }
 
-function isProfileComplete(profile: ProfileLike, userName?: string | null): boolean {
+function isProfileComplete(profile: ProfileLike | undefined, userName?: string | null): boolean {
   if (!profile) return false;
   const hasDocumentNumber = Boolean(profile.nif?.trim() || profile.biNumber?.trim());
   return (
@@ -179,7 +179,32 @@ function unmetRequirements(
   return missing;
 }
 
-const REQUIREMENT_LABELS: Record<'profile' | 'documents' | 'payment', string> = {
+/**
+ * Requisitos em falta a partir de uma inscrição carregada com o perfil, os
+ * documentos e a submissão de pagamento.
+ */
+export function enrollmentMissingRequirements(enrollment: {
+  user: { name?: string | null; studentProfile?: ProfileLike };
+  documents: readonly DocumentLike[];
+  paymentSubmission?: { reviewStatus: DocumentReviewStatus } | null;
+}): Array<'profile' | 'documents' | 'payment'> {
+  return missingRequirements(requirementsOf(enrollment));
+}
+
+function requirementsOf(enrollment: {
+  user: { name?: string | null; studentProfile?: ProfileLike };
+  documents: readonly DocumentLike[];
+  paymentSubmission?: { reviewStatus: DocumentReviewStatus } | null;
+}): RequirementsInput {
+  return {
+    profileComplete: isProfileComplete(enrollment.user.studentProfile, enrollment.user.name),
+    documentKinds: enrollment.documents.map((document) => document.kind),
+    documentsApproved: hasApprovedDocuments(enrollment.documents),
+    paymentApproved: enrollment.paymentSubmission?.reviewStatus === 'APPROVED',
+  };
+}
+
+export const REQUIREMENT_LABELS: Record<'profile' | 'documents' | 'payment', string> = {
   profile: 'dados pessoais do perfil',
   documents: 'documentos aprovados',
   payment: 'comprovativo de pagamento aprovado',
@@ -227,12 +252,11 @@ export async function transitionEnrollment(input: {
     return fail('NOT_ALLOWED', 'É obrigatório indicar o motivo desta transição.');
   }
 
-  const missing = unmetRequirements(to, rule.requires ?? [], {
-    profileComplete: isProfileComplete(enrollment.user.studentProfile, enrollment.user.name),
-    documentKinds: enrollment.documents.map((document) => document.kind),
-    documentsApproved: hasApprovedDocuments(enrollment.documents),
-    paymentApproved: enrollment.paymentSubmission?.reviewStatus === 'APPROVED',
-  });
+  const requisitos = requirementsOf(enrollment);
+  const missing =
+    to === 'APPROVED'
+      ? missingRequirements(requisitos)
+      : unmetRequirements(to, rule.requires ?? [], requisitos);
 
   if (missing.length > 0) {
     const labels = missing.map((requirement) => REQUIREMENT_LABELS[requirement]);

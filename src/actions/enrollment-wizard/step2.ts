@@ -54,6 +54,23 @@ export async function saveStep2(
   const ocrConfidence = Number(formData.get('ocrConfidence') ?? Number.NaN);
   const temOcr = ocrRaw.length > 0;
   const confianca = Number.isFinite(ocrConfidence) ? ocrConfidence : null;
+  const extraido = {
+    fullName: String(formData.get('ocrFullName') ?? '').trim(),
+    biNumber: String(formData.get('ocrBiNumber') ?? '').trim(),
+    birthDate: String(formData.get('ocrBirthDate') ?? '').trim(),
+  };
+  // O resultado do OCR fica guardado com a origem explícita (spec §7): nunca
+  // pode ser confundido com verificação oficial.
+  const ocrGuardado = temOcr
+    ? {
+        source: 'client',
+        engine: 'tesseract.js',
+        lang: 'por+eng',
+        confidence: confianca,
+        raw: ocrRaw,
+        extracted: extraido,
+      }
+    : null;
 
   await prisma.enrollmentDocument.upsert({
     where: { enrollmentId_kind: { enrollmentId, kind: kind as DocKind } },
@@ -65,7 +82,7 @@ export async function saveStep2(
       byteSize: guardado.byteSize,
       sha256: guardado.sha256,
       ocrStatus: temOcr ? 'DONE' : 'NOT_RUN',
-      ...(temOcr ? { ocrRaw, ocrConfidence: confianca, ocrSource: 'client' } : {}),
+      ...(ocrGuardado ? { ocrRaw: ocrGuardado } : {}),
       reviewStatus: 'PENDING',
     },
     update: {
@@ -74,7 +91,7 @@ export async function saveStep2(
       byteSize: guardado.byteSize,
       sha256: guardado.sha256,
       ocrStatus: temOcr ? 'DONE' : 'NOT_RUN',
-      ocrRaw: temOcr ? ocrRaw : Prisma.DbNull,
+      ocrRaw: ocrGuardado ?? Prisma.DbNull,
       ocrConfidence: temOcr ? confianca : null,
       ocrSource: temOcr ? 'client' : null,
       reviewStatus: 'PENDING',

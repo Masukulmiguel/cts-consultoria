@@ -2,8 +2,9 @@ import type { Locale } from '@/i18n/routing';
 import { listRows } from '@/lib/admin/content-repo';
 import { RESOURCES, isResourceKey } from '@/lib/admin/resources';
 import { legacyStatusToNew } from '@/lib/enrollment-status-legacy';
+import { AuthError, requireRole } from '@/lib/rbac';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 export default async function ResourceListPage({
   params,
@@ -13,6 +14,16 @@ export default async function ResourceListPage({
   const { locale, resource } = await params;
   if (!isResourceKey(resource)) notFound();
   const def = RESOURCES[resource];
+
+  if (resource === 'enrollments') {
+    try {
+      await requireRole('SUPER_ADMIN', 'ADMIN', 'SUPPORT');
+    } catch (error) {
+      if (error instanceof AuthError) redirect('/pt/admin');
+      throw error;
+    }
+  }
+
   const rows = await listRows(resource);
 
   const display = (row: Record<string, unknown>, column: string): string => {
@@ -58,12 +69,14 @@ export default async function ResourceListPage({
             {rows.length} registo{rows.length === 1 ? '' : 's'} · editar o que aparece no site
           </p>
         </div>
-        <Link
-          href={`/${locale}/admin/${resource}/novo`}
-          className="inline-flex min-h-11 items-center rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
-        >
-          Novo {def.singular}
-        </Link>
+        {resource === 'enrollments' ? null : (
+          <Link
+            href={`/${locale}/admin/${resource}/novo`}
+            className="inline-flex min-h-11 items-center rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
+          >
+            Novo {def.singular}
+          </Link>
+        )}
       </header>
 
       <div className="overflow-hidden rounded-xl border border-[#1c2c49]">
