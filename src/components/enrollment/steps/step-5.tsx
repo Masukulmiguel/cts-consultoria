@@ -2,6 +2,7 @@
 
 import type { WizardActionResult } from '@/actions/enrollment-wizard/common';
 import { submitEnrollment } from '@/actions/enrollment-wizard/step5';
+import { parseAmountKz } from '@/lib/ocr/extract-amount';
 import { CheckCircle2, CircleDashed, Send } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useActionState, useEffect, useState } from 'react';
@@ -57,6 +58,7 @@ export function Step5({ enrollmentId, pessoais, documentos, curso, pagamento }: 
     null,
   );
   const [aceitou, setAceitou] = useState(false);
+  const preco = parseAmountKz(curso.preco ?? '');
 
   useEffect(() => {
     if (estado?.ok) {
@@ -117,7 +119,10 @@ export function Step5({ enrollmentId, pessoais, documentos, curso, pagamento }: 
             <dl className="mt-2">
               <Linha rotulo="Curso" valor={curso.titulo} />
               <Linha rotulo="Nível" valor={curso.nivel ?? ''} />
-              <Linha rotulo="Valor" valor={curso.preco ? `${curso.preco} Kz` : ''} />
+              <Linha
+                rotulo="Valor"
+                valor={preco !== null ? `${preco.toLocaleString('pt-PT')} Kz` : ''}
+              />
               <Linha rotulo="Método" valor={pagamento.metodo} />
               <Linha rotulo="Valor pago" valor={pagamento.valor} />
               <Linha rotulo="Referência" valor={pagamento.referencia ?? ''} />

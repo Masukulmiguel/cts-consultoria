@@ -5,7 +5,7 @@ const { prismaMock, authMock, notFoundMock, uploadMock } = vi.hoisted(() => {
   return {
     prismaMock: {
       enrollment: { findUnique: vi.fn(), update: vi.fn() },
-      enrollmentDocument: { upsert: vi.fn() },
+      enrollmentDocument: { upsert: vi.fn(), findMany: vi.fn() },
     },
     authMock: vi.fn(),
     notFoundMock: vi.fn(() => {
@@ -61,6 +61,7 @@ beforeEach(() => {
   vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service-role-key');
   authMock.mockResolvedValue({ user: { id: 'u1', role: 'STUDENT' } });
   prismaMock.enrollment.findUnique.mockResolvedValue(inscricao());
+  prismaMock.enrollmentDocument.findMany.mockResolvedValue([{ kind: 'BI_FRONT' }]);
   uploadMock.mockResolvedValue({ data: { path: 'u1/e1/BI_FRONT' }, error: null });
 });
 
@@ -174,5 +175,51 @@ describe('saveStep2', () => {
       'NEXT_NOT_FOUND',
     );
     expect(uploadMock).not.toHaveBeenCalled();
+  });
+
+  it('não avança para a etapa 3 enquanto o verso não estiver gravado', async () => {
+    prismaMock.enrollmentDocument.findMany.mockResolvedValue([{ kind: 'BI_FRONT' }]);
+    const ficheiro = new File([jpeg], 'bi-frente.jpg', { type: 'image/jpeg' });
+
+    const resultado = await saveStep2('e1', null, formData({ kind: 'BI_FRONT' }, ficheiro));
+
+    expect(resultado.ok).toBe(true);
+    expect(resultado.nextStep).not.toBe(3);
+    const chamadas = prismaMock.enrollment.update.mock.calls as unknown as Array<
+      [{ data: { currentStep?: number } }]
+    >;
+    expect(chamadas.some(([args]) => args.data.currentStep === 3)).toBe(false);
+  });
+
+  it('avança para a etapa 3 quando os dois documentos estão gravados', async () => {
+    prismaMock.enrollmentDocument.findMany.mockResolvedValue([
+      { kind: 'BI_FRONT' },
+      { kind: 'BI_BACK' },
+    ]);
+    const ficheiro = new File([jpeg], 'bi-verso.jpg', { type: 'image/jpeg' });
+
+    const resultado = await saveStep2('e1', null, formData({ kind: 'BI_BACK' }, ficheiro));
+
+    expect(resultado.nextStep).toBe(3);
+    expect(prismaMock.enrollment.update).toHaveBeenCalledWith({
+      where: { id: 'e1' },
+      data: { currentStep: 3 },
+    });
+  });
+
+  it('nunca regride o currentStep quando um documento é enviado tarde', async () => {
+    prismaMock.enrollment.findUnique.mockResolvedValue(inscricao({ currentStep: 5 }));
+    prismaMock.enrollmentDocument.findMany.mockResolvedValue([
+      { kind: 'BI_FRONT' },
+      { kind: 'BI_BACK' },
+    ]);
+    const ficheiro = new File([jpeg], 'bi-verso.jpg', { type: 'image/jpeg' });
+
+    await saveStep2('e1', null, formData({ kind: 'BI_BACK' }, ficheiro));
+
+    const chamadas = prismaMock.enrollment.update.mock.calls as unknown as Array<
+      [{ data: { currentStep?: number } }]
+    >;
+    expect(chamadas.some(([args]) => (args.data.currentStep ?? 0) < 5)).toBe(false);
   });
 });

@@ -112,13 +112,26 @@ export async function saveStep2(
     },
   );
 
-  await prisma.enrollment.update({
-    where: { id: enrollmentId },
-    data: { currentStep: 3 },
+  const documentos = await prisma.enrollmentDocument.findMany({
+    where: { enrollmentId },
+    select: { kind: true },
   });
+  const etapaConcluida =
+    documentos.some((documento) => documento.kind === 'BI_FRONT') &&
+    documentos.some((documento) => documento.kind === 'BI_BACK');
+
+  // O `currentStep` nunca regride: só avança quando os dois documentos do
+  // Bilhete de Identidade estão gravados.
+  const currentStep = etapaConcluida ? Math.max(enrollment.currentStep, 3) : enrollment.currentStep;
+  if (currentStep !== enrollment.currentStep) {
+    await prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: { currentStep },
+    });
+  }
 
   const actor = await currentActor();
   await applyCorrectionIfNeeded(enrollment, actor);
 
-  return { ok: true, nextStep: 3, comparison };
+  return { ok: true, nextStep: etapaConcluida ? 3 : 2, comparison };
 }

@@ -44,10 +44,16 @@ export function Step2({ enrollmentId, documentoFrente, documentoVerso }: Props) 
   const [aLer, setALer] = useState(false);
 
   useEffect(() => {
-    if (estadoFrente?.ok && estadoFrente.nextStep === 3 && ficheiroFrente) {
+    if (estadoFrente?.ok && estadoFrente.nextStep === 3) {
       router.push(`/pt/aluno/inscricao/${enrollmentId}/etapa/3`);
     }
-  }, [estadoFrente, enrollmentId, ficheiroFrente, router]);
+  }, [estadoFrente, enrollmentId, router]);
+
+  useEffect(() => {
+    if (estadoVerso?.ok && estadoVerso.nextStep === 3) {
+      router.push(`/pt/aluno/inscricao/${enrollmentId}/etapa/3`);
+    }
+  }, [estadoVerso, enrollmentId, router]);
 
   async function escolher(file: File | null, frente: boolean) {
     if (frente) {
