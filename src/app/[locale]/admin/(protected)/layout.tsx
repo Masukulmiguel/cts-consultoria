@@ -1,7 +1,7 @@
 import { AdminShell } from '@/components/admin/admin-shell';
 import { ADMIN_NAV } from '@/lib/admin/nav';
 import { signOut } from '@/lib/auth';
-import { AuthError, requireUser } from '@/lib/rbac';
+import { AuthError, requireRole, requireUser } from '@/lib/rbac';
 import { redirect } from 'next/navigation';
 
 export default async function AdminLayout({
@@ -20,6 +20,13 @@ export default async function AdminLayout({
     user = await requireUser();
   } catch (err) {
     if (err instanceof AuthError) redirect('/pt/admin/login');
+    throw err;
+  }
+
+  try {
+    await requireRole('SUPER_ADMIN', 'ADMIN', 'CONTENT', 'SUPPORT');
+  } catch (err) {
+    if (err instanceof AuthError) redirect(user.role === 'STUDENT' ? '/pt/aluno' : '/pt');
     throw err;
   }
 
