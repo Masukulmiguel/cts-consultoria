@@ -44,8 +44,13 @@ export async function listRows(key: ResourceKey): Promise<ResourceRow[]> {
       return prisma.enrollment.findMany({
         select: {
           id: true,
+          userId: true,
+          courseId: true,
+          status: true,
+          progress: true,
+          createdAt: true,
           user: { select: { id: true, name: true, email: true } },
-          course: { select: { id: true, title: true, level: true } },
+          course: { select: { id: true, level: true, title: true } },
         },
         orderBy: { createdAt: 'desc' },
       }) as Promise<ResourceRow[]>;

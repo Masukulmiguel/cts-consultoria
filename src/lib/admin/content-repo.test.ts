@@ -22,9 +22,16 @@ describe('listRows', () => {
     expect(args.include).toBeUndefined();
     expect(args.select).toMatchObject({
       id: true,
+      userId: true,
+      courseId: true,
+      status: true,
+      progress: true,
+      createdAt: true,
       user: { select: { id: true, name: true, email: true } },
       course: { select: { id: true, title: true, level: true } },
     });
+    expect(Object.keys(args.select.user.select).sort()).toEqual(['email', 'id', 'name']);
+    expect(Object.keys(args.select.course.select).sort()).toEqual(['id', 'level', 'title']);
     expect(JSON.stringify(args)).not.toContain('passwordHash');
   });
 });

@@ -26,8 +26,9 @@ export default async function AdminLayout({
   try {
     await requireRole('SUPER_ADMIN', 'ADMIN', 'CONTENT', 'SUPPORT');
   } catch (err) {
-    if (err instanceof AuthError) redirect(user.role === 'STUDENT' ? '/pt/aluno' : '/pt');
-    throw err;
+    if (!(err instanceof AuthError)) throw err;
+    if (err.code === 'FORBIDDEN') redirect(user.role === 'STUDENT' ? '/pt/aluno' : '/pt');
+    redirect('/pt/admin/login');
   }
 
   return (
