@@ -52,7 +52,7 @@ export default async function PlannedAdminPage({
         </p>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/55">
           A área já está preparada na navegação e com controlo de permissões. Os conteúdos editáveis
-          — serviços, cursos, notícias e FAQs — estão disponíveis no menu Conteúdos.
+          (serviços, cursos, notícias e FAQs) estão disponíveis no menu Conteúdos.
         </p>
       </div>
     </div>

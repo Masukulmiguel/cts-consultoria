@@ -140,7 +140,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       {
         id: 'a2',
         title: 'Novo contacto pelo site',
-        description: 'Formulário de contacto — Luanda',
+        description: 'Formulário de contacto, Luanda',
         time: 'Há 42 minutos',
         color: '#16a36a',
         href: '/pt/admin/clientes/contactos',
@@ -148,7 +148,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       {
         id: 'a3',
         title: 'Pagamento validado',
-        description: 'Formação Prática — Sénior',
+        description: 'Formação Prática, Sénior',
         time: 'Há 2 horas',
         color: '#e2912b',
         href: '/pt/admin/pagamentos',
@@ -164,7 +164,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       {
         id: 'a5',
         title: 'Inscrição aprovada',
-        description: 'Formação — 250.000 Kz',
+        description: 'Formação, 250.000 Kz',
         time: 'Há 5 horas',
         color: '#c445a8',
         href: '/pt/admin/inscricoes',

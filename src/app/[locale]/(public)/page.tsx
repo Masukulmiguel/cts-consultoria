@@ -1,3 +1,4 @@
+import { ScrollGallery } from '@/components/gallery/scroll-gallery';
 import { HeroSlider } from '@/components/hero/hero-slider';
 import { ParallaxLayer } from '@/components/scroll/parallax-layer';
 import { Reveal } from '@/components/scroll/reveal';
@@ -137,8 +138,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
 
             <blockquote className="mt-10 rounded-r-lg border-l-4 border-accent-500 bg-surface-muted p-7 font-display text-lg leading-relaxed text-ink">
               “{mission[locale]}”
-              <footer className="mt-4 text-sm text-ink-muted">
-                — {company.ceo.name}, {company.ceo.role[locale]}
+              <footer className="mt-4 text-sm font-medium text-ink-muted">
+                {company.ceo.name}, {company.ceo.role[locale]}
               </footer>
             </blockquote>
           </Reveal>
@@ -215,9 +216,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
         </div>
       </section>
 
-      <section className="section-y overflow-hidden bg-surface">
+      <section className="bg-surface py-16 lg:py-0">
         <div className="shell">
-          <div className="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <ScrollGallery
+            images={GALLERY.map((item) => ({
+              src: item.src,
+              alt: item.alt[locale],
+              className: item.className,
+            }))}
+          >
             <Reveal>
               <p className="eyebrow">CTS Academia</p>
               <h2 className="heading-lg mt-5">
@@ -225,8 +232,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
               </h2>
               <p className="lede mt-5">
                 {isPt
-                  ? 'Contabilidade, fiscalidade, Primavera v10 e recursos humanos — com certificados homologados pelo INEFOP e estágios profissionais.'
-                  : 'Accounting, tax, Primavera v10 and human resources — with INEFOP-homologated certificates and professional internships.'}
+                  ? 'Contabilidade, fiscalidade, Primavera v10 e recursos humanos, com certificados homologados pelo INEFOP e estágios profissionais.'
+                  : 'Accounting, tax, Primavera v10 and human resources, with INEFOP-homologated certificates and professional internships.'}
               </p>
 
               <ul className="mt-8 space-y-6">
@@ -255,30 +262,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
                 </Link>
               </div>
             </Reveal>
-
-            <Reveal delay={0.12}>
-              <ParallaxLayer speed={0.7}>
-                <div className="grid grid-cols-2 gap-4">
-                  {GALLERY.slice(0, 4).map((item) => (
-                    <figure
-                      key={item.src}
-                      className={`group relative aspect-4/3 overflow-hidden rounded-lg border border-border ${item.className}`}
-                    >
-                      <TiltCard className="absolute inset-0" max={2}>
-                        <Image
-                          src={item.src}
-                          alt={item.alt[locale]}
-                          fill
-                          sizes="(max-width: 1024px) 50vw, 30vw"
-                          className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
-                        />
-                      </TiltCard>
-                    </figure>
-                  ))}
-                </div>
-              </ParallaxLayer>
-            </Reveal>
-          </div>
+          </ScrollGallery>
         </div>
       </section>
 

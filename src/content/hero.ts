@@ -3,7 +3,6 @@ import type { Localized } from '@/content/services';
 export type HeroSlide = {
   id: string;
   image: string;
-  kicker: Localized;
   title: Localized;
   text: Localized;
   cta: { label: Localized; href: Localized };
@@ -14,7 +13,6 @@ export const heroSlides: HeroSlide[] = [
   {
     id: 'contabilidade',
     image: '/hero/hero-03.jpg',
-    kicker: { pt: 'Contabilidade · Fiscalidade · ERP', en: 'Accounting · Tax · ERP' },
     title: {
       pt: 'Conformidade financeira que sustenta decisões de gestão',
       en: 'Financial compliance that backs every management decision',
@@ -35,7 +33,6 @@ export const heroSlides: HeroSlide[] = [
   {
     id: 'formacao',
     image: '/hero/hero-01.jpg',
-    kicker: { pt: 'CTS Academia', en: 'CTS Academy' },
     title: {
       pt: 'Formação prática com certificados homologados pelo INEFOP',
       en: 'Practical training with INEFOP-homologated certificates',
@@ -56,7 +53,6 @@ export const heroSlides: HeroSlide[] = [
   {
     id: 'anpg',
     image: '/hero/hero-02.jpg',
-    kicker: { pt: 'Certificação oficial', en: 'Official certification' },
     title: {
       pt: 'Fornecedor homologado pela ANPG',
       en: 'Certified ANPG supplier',
@@ -77,7 +73,6 @@ export const heroSlides: HeroSlide[] = [
   {
     id: 'fecho',
     image: '/hero/hero-04.jpg',
-    kicker: { pt: 'Equipa de especialistas', en: 'A team of specialists' },
     title: {
       pt: 'Da escrituração ao fecho de contas, sem interromper a operação',
       en: 'From bookkeeping to year-end closing, without interrupting operations',

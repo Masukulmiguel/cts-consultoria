@@ -15,7 +15,7 @@
     "heroKicker": "Desde 2016 em Luanda",
     "heroTitle": "Garantir o cumprimento das Obrigações Contabilísticas e Fiscais com as melhores práticas de Gestão.",
     "heroText": "A CTS Consultoria Empresarial & Gestão de Negócios garante a qualidade rigorosa da informação financeira, com ênfase na conformidade tributária perante a AGT e otimização da gestão empresarial em Angola.",
-    "status": "Website em construção — nova plataforma em desenvolvimento."
+    "status": "Website em construção: nova plataforma em desenvolvimento."
   },
   "common": {
     "language": "Idioma",
@@ -32,6 +32,12 @@
     "invalid": "Credenciais inválidas.",
     "rateLimited": "Demasiadas tentativas. Aguarde alguns minutos.",
     "dashboard": "Painel",
-    "welcome": "Sessão iniciada"
+    "welcome": "Sessão iniciada",
+    "loginHeading": "Bem-vindo de volta!",
+    "loginIntro": "Introduza os seus dados para aceder à sua conta.",
+    "loginHelp": "Precisa de ajuda?",
+    "loginHelpLink": "Contacte o suporte técnico.",
+    "showPassword": "Mostrar palavra-passe",
+    "hidePassword": "Ocultar palavra-passe"
   }
 }

@@ -31,7 +31,7 @@ export default async function PublicLayout({
       </a>
       <ScrollProgress />
       <SiteHeader />
-      <main id="conteudo" aria-label={localeText.main} className="flex-1 pt-[116px]">
+      <main id="conteudo" aria-label={localeText.main} className="flex-1 pt-[var(--header-height)]">
         {children}
       </main>
       <SiteFooter locale={safeLocale} />

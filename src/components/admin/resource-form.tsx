@@ -69,7 +69,7 @@ export function ResourceForm({ resource, record, locale, relationOptions }: Reso
                     defaultValue={value as string}
                     className="mt-2 w-full rounded-lg border border-[#1c2c49] bg-[#0d1729] px-3 py-2 text-sm text-white focus:border-primary-500 focus:outline-none"
                   >
-                    <option value="">{field.required ? 'Seleccionar…' : '—'}</option>
+                    <option value="">{field.required ? 'Seleccionar…' : 'Sem valor'}</option>
                     {(field.type === 'select'
                       ? (field.options ?? [])
                       : (relationOptions?.[field.relation ?? 'users'] ?? [])

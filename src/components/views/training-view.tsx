@@ -3,25 +3,10 @@ import { Reveal } from '@/components/scroll/reveal';
 import { TiltCard } from '@/components/scroll/tilt-card';
 import { trainingFamilies } from '@/content/services';
 import { getPublicCourses } from '@/lib/content-db';
-import { localePath } from '@/lib/site';
+import { coursePath, localePath } from '@/lib/site';
 import { ArrowRight, Award, CheckCircle2, GraduationCap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-
-const FLYERS = [
-  { src: '/training/flyer-1.jpg', label: 'Contabilidade e Fiscalidade' },
-  { src: '/training/flyer-2.jpg', label: 'Contabilidade e Fiscalidade' },
-  { src: '/training/flyer-3.jpg', label: 'Contabilidade e Fiscalidade' },
-  { src: '/training/flyer-4.jpg', label: 'Contabilidade e Fiscalidade' },
-  { src: '/training/flyer-5.jpg', label: 'Contabilidade e Fiscalidade' },
-  { src: '/training/flyer-6.jpg', label: 'Contabilidade e Fiscalidade' },
-  { src: '/training/flyer-7.jpg', label: 'Gestão de RH' },
-  { src: '/training/flyer-8.jpg', label: 'Gestão de RH' },
-  { src: '/training/flyer-9.jpg', label: 'Primavera v10' },
-  { src: '/training/flyer-10.jpg', label: 'Primavera v10' },
-  { src: '/training/flyer-11.jpg', label: 'Primavera v10' },
-  { src: '/training/campanha-dia-da-mulher.jpg', label: 'Campanha Dia da Mulher' },
-];
 
 export async function TrainingView({ locale }: { locale: 'pt' | 'en' }) {
   const isPt = locale === 'pt';
@@ -103,110 +88,75 @@ export async function TrainingView({ locale }: { locale: 'pt' | 'en' }) {
         <section className="section-y bg-surface">
           <div className="shell">
             <Reveal>
-              <p className="eyebrow">{isPt ? 'Cursos publicados' : 'Published courses'}</p>
+              <p className="eyebrow">{isPt ? 'Panfletos oficiais' : 'Official flyers'}</p>
               <h2 className="heading-lg mt-5 max-w-2xl">
-                {isPt ? 'Programas disponíveis para inscrição' : 'Programmes open for enrolment'}
+                {isPt
+                  ? 'Programas publicados pela CTS Academia'
+                  : 'Programmes published by CTS Academy'}
               </h2>
+              <p className="lede mt-5">
+                {isPt
+                  ? 'Passe o rato sobre um panfleto para ver a descrição, ou inscreva-se directamente no curso.'
+                  : 'Hover a flyer to read the description, or enrol directly in the programme.'}
+              </p>
             </Reveal>
 
-            <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {courses.map((course, index) => (
-                <Reveal key={course.id} delay={index * 0.04}>
-                  <TiltCard className="h-full" max={2}>
-                    <article className="card card-hover flex h-full flex-col overflow-hidden">
-                      {course.imageUrl ? (
-                        <div className="relative aspect-3/4 overflow-hidden bg-surface-muted">
-                          <Image
-                            src={course.imageUrl}
-                            alt={course.title[locale]}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                            className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                          />
+                <Reveal key={course.id} delay={Math.min(index * 0.02, 0.2)}>
+                  <article className="group overflow-hidden rounded-lg border border-border bg-surface shadow-xs transition duration-200 ease-cts-enter hover:-translate-y-1 hover:shadow-lg">
+                    <Link href={coursePath(locale, course.slug)} className="block">
+                      <div className="relative aspect-3/4 overflow-hidden bg-surface-muted">
+                        <Image
+                          src={course.imageUrl ?? course.brochureUrl ?? '/training/flyer-1.jpg'}
+                          alt={`${course.title[locale]} — panfleto CTS Academia`}
+                          fill
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                          className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+                        />
+                        <div
+                          aria-hidden="true"
+                          className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-ink/95 via-ink/85 to-ink/45 p-4 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
+                        >
+                          <span className="text-2xs font-semibold uppercase tracking-[0.14em] text-accent-300">
+                            {course.level ?? course.family}
+                          </span>
+                          <h3 className="mt-1.5 font-display text-sm font-semibold leading-snug">
+                            {course.title[locale]}
+                          </h3>
+                          <p className="mt-2 line-clamp-4 text-xs leading-relaxed text-white/85">
+                            {course.summary[locale]}
+                          </p>
+                          <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent-300">
+                            {isPt ? 'Inscrever-se' : 'Enrol now'}
+                            <ArrowRight size={13} />
+                          </span>
                         </div>
-                      ) : null}
-                      <div className="flex flex-1 flex-col p-7">
-                        <span className="inline-flex w-fit rounded-pill bg-primary-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.14em] text-primary-700">
+                      </div>
+
+                      <div className="p-4">
+                        <span className="text-2xs font-semibold uppercase tracking-[0.14em] text-primary-700">
                           {course.level ?? course.family}
                         </span>
-                        <h3 className="mt-4 font-display text-lg font-semibold leading-snug text-ink">
+                        <h3 className="mt-1.5 font-display text-sm font-semibold leading-snug text-ink">
                           {course.title[locale]}
                         </h3>
-                        <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-secondary">
+                        <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed text-ink-secondary">
                           {course.summary[locale]}
                         </p>
-                        {course.duration || course.price ? (
-                          <dl className="mt-5 flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-4 text-xs">
-                            {course.duration ? (
-                              <div>
-                                <dt className="uppercase tracking-[0.14em] text-ink-muted">
-                                  {isPt ? 'Duração' : 'Duration'}
-                                </dt>
-                                <dd className="mt-1 font-semibold text-ink">{course.duration}</dd>
-                              </div>
-                            ) : null}
-                            {course.price ? (
-                              <div>
-                                <dt className="uppercase tracking-[0.14em] text-ink-muted">
-                                  {isPt ? 'Investimento' : 'Fee'}
-                                </dt>
-                                <dd className="mt-1 font-semibold text-ink">{course.price}</dd>
-                              </div>
-                            ) : null}
-                          </dl>
-                        ) : null}
-                        <Link
-                          href={`${localePath(locale, 'contact')}#contacto`}
-                          className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 transition-colors hover:text-accent-600"
-                        >
+                        <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary-700">
                           {isPt ? 'Inscrever-se' : 'Enrol now'}
-                          <ArrowRight size={15} />
-                        </Link>
+                          <ArrowRight size={13} />
+                        </span>
                       </div>
-                    </article>
-                  </TiltCard>
+                    </Link>
+                  </article>
                 </Reveal>
               ))}
             </div>
           </div>
         </section>
       ) : null}
-
-      <section className="section-y bg-surface">
-        <div className="shell">
-          <Reveal>
-            <p className="eyebrow">{isPt ? 'Panfletos oficiais' : 'Official flyers'}</p>
-            <h2 className="heading-lg mt-5 max-w-2xl">
-              {isPt
-                ? 'Programas publicados pela CTS Academia'
-                : 'Programmes published by CTS Academy'}
-            </h2>
-            <p className="lede mt-5">
-              {isPt
-                ? 'Consulte os panfletos das formações, níveis e conteúdos publicados pela equipa CTS.'
-                : 'Browse the flyers for each training programme, level and published syllabus.'}
-            </p>
-          </Reveal>
-
-          <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {FLYERS.map((flyer, index) => (
-              <Reveal key={flyer.src} delay={Math.min(index * 0.02, 0.2)}>
-                <figure className="group overflow-hidden rounded-lg border border-border bg-surface shadow-xs transition duration-200 ease-cts-enter hover:-translate-y-1 hover:shadow-lg">
-                  <div className="relative aspect-3/4 overflow-hidden bg-surface-muted">
-                    <Image
-                      src={flyer.src}
-                      alt={`${flyer.label} — panfleto CTS Academia`}
-                      fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
-                    />
-                  </div>
-                </figure>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <section className="section-y border-t border-border bg-surface-muted">
         <div className="shell grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">

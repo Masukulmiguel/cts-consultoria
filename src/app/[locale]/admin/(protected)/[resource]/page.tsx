@@ -20,11 +20,11 @@ export default async function ResourceListPage({
       return row.publishedAt instanceof Date ? row.publishedAt.toLocaleDateString('pt-PT') : '';
     if (column === 'userId') {
       const user = row.user as { name?: string; email?: string } | undefined;
-      return user?.name ?? user?.email ?? String(row.userId ?? '—');
+      return user?.name ?? user?.email ?? String(row.userId ?? 'Sem utilizador');
     }
     if (column === 'courseId') {
       const course = row.course as { title?: string } | undefined;
-      return course?.title ?? String(row.courseId ?? '—');
+      return course?.title ?? String(row.courseId ?? 'Sem curso');
     }
     if (column === 'status') {
       const labels: Record<string, string> = {
@@ -38,7 +38,7 @@ export default async function ResourceListPage({
       return labels[value] ?? value;
     }
     if (column === 'progress') return `${String(row.progress ?? 0)}%`;
-    return String(row[column] ?? '—');
+    return String(row[column] ?? 'Sem valor');
   };
 
   return (

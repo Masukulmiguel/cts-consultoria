@@ -47,7 +47,7 @@ export function HeroSlider({ locale }: { locale: 'pt' | 'en' }) {
         if (event.key === 'ArrowLeft') goTo(index - 1);
       }}
     >
-      <div className="relative h-[560px] w-full sm:h-[640px] lg:h-[calc(100vh-116px)] lg:min-h-[620px]">
+      <div className="relative h-[560px] w-full sm:h-[640px] lg:h-[calc(100vh-var(--header-height))] lg:min-h-[620px]">
         {heroSlides.map((item, itemIndex) => {
           const active = itemIndex === index;
           return (
@@ -102,7 +102,6 @@ export function HeroSlider({ locale }: { locale: 'pt' | 'en' }) {
                 className={`max-w-2xl ${itemIndex === index ? '' : 'pointer-events-none absolute inset-x-5 sm:inset-x-8 lg:inset-x-10'}`}
                 aria-hidden={itemIndex !== index}
               >
-                <p className="eyebrow text-accent-300">{item.kicker[locale]}</p>
                 {itemIndex === 0 ? (
                   <h1 className="mt-4 bg-gradient-to-r from-white to-white/65 bg-clip-text font-display text-3xl leading-[1.1] font-bold text-transparent sm:mt-5 sm:text-5xl lg:text-6xl">
                     {item.title[locale]}

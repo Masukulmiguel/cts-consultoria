@@ -3,27 +3,12 @@
 import { switchLocalePath } from '@/content/locale-paths';
 import { services, trainingFamilies } from '@/content/services';
 import { localePath } from '@/lib/site';
-import { ChevronDown, Globe, Menu, X } from 'lucide-react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { ChevronDown, Globe, LogIn, Menu, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-
-const TICKER: Record<'pt' | 'en', string[]> = {
-  pt: [
-    'Certificação ANPG — fornecedor homologado',
-    '11 a 50 especialistas em contabilidade e fiscalidade',
-    'Formação com certificados homologados pelo INEFOP',
-    'Desde 2016 em Luanda, Angola',
-  ],
-  en: [
-    'ANPG certification — certified supplier',
-    '11 to 50 accounting and tax specialists',
-    'Training with INEFOP-homologated certificates',
-    'Since 2016 in Luanda, Angola',
-  ],
-};
 
 const COPY = {
   pt: {
@@ -36,6 +21,7 @@ const COPY = {
     news: 'Notícias',
     contact: 'Contactos',
     cta: 'Fale Connosco',
+    login: 'Entrar',
     navLabel: 'Navegação principal',
     mobileLabel: 'Navegação móvel',
     language: 'Mudar idioma',
@@ -51,6 +37,7 @@ const COPY = {
     news: 'News',
     contact: 'Contact',
     cta: 'Contact Us',
+    login: 'Sign in',
     navLabel: 'Main navigation',
     mobileLabel: 'Mobile navigation',
     language: 'Change language',
@@ -65,13 +52,10 @@ export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const copy = COPY[locale];
-  const reduce = useReducedMotion();
 
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [mega, setMega] = useState<'services' | 'training' | null>(null);
-  const [tickerIndex, setTickerIndex] = useState(0);
-  const [tickerPaused, setTickerPaused] = useState(false);
 
   const drawerRef = useRef<HTMLDialogElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -82,16 +66,6 @@ export function SiteHeader() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  useEffect(() => {
-    if (reduce) return;
-    if (tickerPaused) return;
-    const timer = window.setInterval(
-      () => setTickerIndex((index) => (index + 1) % TICKER[locale].length),
-      4200,
-    );
-    return () => window.clearInterval(timer);
-  }, [locale, tickerPaused, reduce]);
 
   useEffect(() => {
     if (!drawerOpen) return;
@@ -140,6 +114,7 @@ export function SiteHeader() {
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const serviceHref = localePath(locale, 'services');
   const trainingHref = localePath(locale, 'training');
+  const loginHref = `/${locale}/aluno/login`;
 
   const navItems = [
     { key: 'about', label: copy.about, href: localePath(locale, 'about') },
@@ -196,53 +171,11 @@ export function SiteHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       <div
-        className="overflow-hidden bg-ink text-white"
-        onMouseEnter={() => setTickerPaused(true)}
-        onMouseLeave={() => setTickerPaused(false)}
-        onFocus={() => setTickerPaused(true)}
-        onBlur={() => setTickerPaused(false)}
-      >
-        <div className="shell flex h-9 items-center justify-between gap-4">
-          <div className="relative h-9 min-w-0 flex-1 overflow-hidden">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.p
-                key={`${locale}-${tickerIndex}`}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute inset-0 flex items-center gap-2 text-[11px] font-medium tracking-wide text-white/80 sm:text-xs"
-              >
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent-500" />
-                <span className="truncate">{TICKER[locale][tickerIndex]}</span>
-              </motion.p>
-            </AnimatePresence>
-          </div>
-          <div className="hidden items-center gap-1 sm:flex">
-            {TICKER[locale].map((message, index) => (
-              <button
-                key={message}
-                type="button"
-                onClick={() => setTickerIndex(index)}
-                aria-label={message}
-                aria-current={index === tickerIndex}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === tickerIndex
-                    ? 'w-5 bg-accent-500'
-                    : 'w-1.5 bg-white/30 hover:bg-white/60'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div
         className={`border-b border-border bg-surface/95 backdrop-blur-md transition-all duration-300 ${
           scrolled ? 'shadow-md' : 'shadow-none'
         }`}
       >
-        <div className="shell flex items-center justify-between gap-6">
+        <div className="shell flex min-h-12 items-center justify-between gap-6">
           <Link
             href={localePath(locale, 'home')}
             className="flex shrink-0 items-center"
@@ -335,6 +268,15 @@ export function SiteHeader() {
               <Globe size={14} />
               {OTHER_LABEL[locale]}
             </button>
+
+            <Link
+              href={loginHref}
+              aria-current={isActive(loginHref) ? 'page' : undefined}
+              className="btn-outline hidden h-10 items-center gap-1.5 px-4 lg:inline-flex"
+            >
+              <LogIn size={15} aria-hidden="true" />
+              {copy.login}
+            </Link>
 
             <Link
               href={`${localePath(locale, 'contact')}#contacto`}
@@ -455,6 +397,14 @@ export function SiteHeader() {
               </nav>
 
               <div className="border-t border-border px-5 py-5">
+                <Link
+                  href={loginHref}
+                  onClick={() => setDrawerOpen(false)}
+                  className="btn-outline mb-3 w-full"
+                >
+                  <LogIn size={16} aria-hidden="true" />
+                  {copy.login}
+                </Link>
                 <Link
                   href={`${localePath(locale, 'contact')}#contacto`}
                   onClick={() => setDrawerOpen(false)}

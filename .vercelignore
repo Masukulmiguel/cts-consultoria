@@ -1,0 +1,7 @@
+docs/
+.superpowers/
+.env
+.env.*
+*.txt
+tmp-*
+wide_professional_corporate_technology_business_ba.png

@@ -46,3 +46,11 @@ android/*.keystore
 android/build/
 android/.gradle/
 android/app/build/
+
+# Scratch do fluxo SDD (revisoes, briefs, ledgers)
+.superpowers/
+
+# Imagens de verificacao de screenshots
+docs/assets/login-dev-*
+docs/assets/repro-*
+docs/assets/auth-check-*

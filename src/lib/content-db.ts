@@ -62,6 +62,7 @@ export type PublicCourse = {
   level: string | null;
   duration: string | null;
   price: string | null;
+  brochureUrl: string | null;
   imageUrl: string | null;
 };
 
@@ -81,9 +82,11 @@ export async function getPublicCourses(): Promise<PublicCourse[]> {
       level: row.level,
       duration: row.duration,
       price: row.price,
+      brochureUrl: row.brochureUrl,
       imageUrl: row.imageUrl,
     }));
-  } catch {
+  } catch (error) {
+    console.error('[content-db] getPublicCourses falhou:', error);
     return [];
   }
 }

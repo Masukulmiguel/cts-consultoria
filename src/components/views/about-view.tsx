@@ -59,8 +59,8 @@ export function AboutView({ locale }: { locale: 'pt' | 'en' }) {
 
             <blockquote className="mt-10 rounded-r-lg border-l-4 border-accent-500 bg-surface-muted p-7 font-display text-lg leading-relaxed text-ink">
               “{mission[locale]}”
-              <footer className="mt-4 text-sm text-ink-muted">
-                — {company.ceo.name}, {company.ceo.role[locale]}
+              <footer className="mt-4 text-sm font-medium text-ink-muted">
+                {company.ceo.name}, {company.ceo.role[locale]}
               </footer>
             </blockquote>
           </Reveal>

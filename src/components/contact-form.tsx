@@ -21,8 +21,8 @@ export function ContactForm({ locale }: { locale: 'pt' | 'en' }) {
         </p>
         <p className="mt-2 leading-relaxed text-ink-secondary">
           {locale === 'pt'
-            ? 'Recebemos o seu pedido. A equipa CTS responde em horário de expediente — normalmente em menos de um dia útil.'
-            : 'We received your request. The CTS team replies during business hours — normally within one working day.'}
+            ? 'Recebemos o seu pedido. A equipa CTS responde em horário de expediente, normalmente em menos de um dia útil.'
+            : 'We received your request. The CTS team replies during business hours, normally within one working day.'}
         </p>
       </output>
     );

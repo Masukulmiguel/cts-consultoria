@@ -1,8 +1,9 @@
 'use client';
 
 import { CHAT_SUGGESTIONS, type ChatLink } from '@/content/chatbot';
-import { Bot, Loader2, Send, X } from 'lucide-react';
+import { Loader2, Send, X } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Message = {
@@ -23,6 +24,7 @@ const COPY = {
     send: 'Enviar',
     thinking: 'A escrever…',
     disclaimer: 'Assistente virtual CTS. Para propostas, fale com a nossa equipa.',
+    hint: 'Olá! Posso ajudar?',
     greeting:
       'Olá! Sou o assistente da CTS Consultoria. Posso ajudar com serviços de contabilidade, fiscalidade, formação ou contactos. Como posso ajudar?',
   },
@@ -35,6 +37,7 @@ const COPY = {
     send: 'Send',
     thinking: 'Typing…',
     disclaimer: 'CTS virtual assistant. For proposals, talk to our team.',
+    hint: 'Hello! Can I help?',
     greeting:
       'Hello! I am the CTS Consulting assistant. I can help with accounting, tax, training or contact questions. How can I help?',
   },
@@ -51,6 +54,17 @@ export function ChatbotWidget({ locale }: { locale: 'pt' | 'en' }) {
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [started, setStarted] = useState(false);
+  const [hintVisible, setHintVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setHintVisible(true), 2000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const openChat = () => {
+    setHintVisible(false);
+    setOpen(true);
+  };
 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
@@ -155,8 +169,14 @@ export function ChatbotWidget({ locale }: { locale: 'pt' | 'en' }) {
             className="static m-0 flex h-[480px] w-[min(22rem,calc(100vw-2.5rem))] max-w-none flex-col overflow-hidden rounded-xl border border-border bg-surface text-inherit shadow-xl"
           >
             <header className="flex items-center gap-3 border-b border-border bg-ink px-4 py-3 text-white">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent-500">
-                <Bot size={18} aria-hidden="true" />
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
+                <Image
+                  src="/brand/cts-mark.png"
+                  alt=""
+                  width={36}
+                  height={36}
+                  className="h-full w-full object-cover"
+                />
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">{copy.title}</p>
@@ -266,27 +286,68 @@ export function ChatbotWidget({ locale }: { locale: 'pt' | 'en' }) {
         )}
       </AnimatePresence>
 
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        aria-expanded={open}
-        aria-label={open ? copy.close : copy.open}
-        className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-accent-500 text-white shadow-lg transition duration-200 ease-cts-enter hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl"
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={open ? 'close' : 'open'}
-            initial={reduce ? false : { opacity: 0, rotate: -45, scale: 0.8 }}
-            animate={{ opacity: 1, rotate: 0, scale: 1 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, rotate: 45, scale: 0.8 }}
-            transition={{ duration: 0.15 }}
-            className="inline-flex"
-          >
-            {open ? <X size={24} /> : <Bot size={24} />}
-          </motion.span>
-        </AnimatePresence>
-      </button>
+      <div className="relative">
+        <div className="absolute bottom-full right-0 mb-3 sm:bottom-1/2 sm:right-full sm:mr-3 sm:mb-0 sm:translate-y-1/2">
+          <AnimatePresence>
+            {hintVisible && !open && (
+              <motion.div
+                key="hint"
+                aria-hidden="true"
+                initial={reduce ? false : { opacity: 0, y: 10, scale: 0.92 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+              >
+                <button
+                  type="button"
+                  onClick={openChat}
+                  className="relative whitespace-nowrap rounded-lg border border-border bg-white px-3.5 py-2 text-sm font-semibold text-ink shadow-lg transition-colors hover:text-primary-700"
+                >
+                  {copy.hint}
+                  <span className="absolute -bottom-1 right-3 h-3 w-3 rotate-45 rounded-[2px] border-r border-b border-border bg-white sm:-right-1 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:border-b-0 sm:border-t" />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={() => {
+            setHintVisible(false);
+            setOpen((value) => !value);
+          }}
+          aria-expanded={open}
+          aria-label={open ? copy.close : copy.open}
+          className="relative inline-flex h-14 w-14 items-center justify-center rounded-full bg-accent-500 text-white shadow-lg transition duration-200 ease-cts-enter hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl"
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span
+              key={open ? 'close' : 'open'}
+              initial={reduce ? false : { opacity: 0, rotate: -45, scale: 0.8 }}
+              animate={{ opacity: 1, rotate: 0, scale: 1 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, rotate: 45, scale: 0.8 }}
+              transition={{ duration: 0.15 }}
+              className="inline-flex"
+            >
+              {open ? (
+                <X size={24} />
+              ) : (
+                <span className="inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm">
+                  <Image
+                    src="/brand/cts-mark.png"
+                    alt=""
+                    width={44}
+                    height={44}
+                    className="h-full w-full object-cover"
+                  />
+                </span>
+              )}
+            </motion.span>
+          </AnimatePresence>
+        </button>
+      </div>
     </div>
   );
 }

@@ -11,7 +11,6 @@ type Props = { params: Promise<{ locale: Locale; section: string; slug: string }
 /** Os conteúdos vêm da base de dados; revalida a cada 60 segundos. */
 export const revalidate = 60;
 
-/** Apenas os serviços têm páginas de detalhe. */
 export function generateStaticParams() {
   return services.flatMap((s) => [
     { locale: 'pt', section: 'servicos', slug: s.slug.pt },
@@ -23,16 +22,21 @@ export function generateStaticParams() {
 export const dynamicParams = true;
 
 export async function generateMetadata({ params }: Props) {
-  const { locale, slug } = await params;
+  const { locale, section, slug } = await params;
+  const key = resolveSection(locale, section);
+
+  if (key !== 'services') return {};
+
   const list = await getPublicServices();
   const service = list.find((s) => s.slug[locale] === slug);
   if (!service) return {};
   return { title: service.title[locale], description: service.summary[locale] };
 }
 
-export default async function ServicePage({ params }: Props) {
+export default async function DetailPage({ params }: Props) {
   const { locale, section, slug } = await params;
   const key = resolveSection(locale, section);
+
   if (key !== 'services') notFound();
 
   const list = await getPublicServices();

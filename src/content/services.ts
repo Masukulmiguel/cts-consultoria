@@ -75,7 +75,7 @@ export const facts = [
   },
   {
     label: { pt: 'Certificação', en: 'Certification' } satisfies Localized,
-    value: { pt: 'ANPG — Homologado', en: 'ANPG — Certified' } satisfies Localized,
+    value: { pt: 'Homologado pela ANPG', en: 'Certified by ANPG' } satisfies Localized,
   },
   {
     label: { pt: 'Sede', en: 'Headquarters' } satisfies Localized,
