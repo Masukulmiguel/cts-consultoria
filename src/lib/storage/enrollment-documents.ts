@@ -16,10 +16,10 @@ type ActorLike = { userId: string; role: UserRole };
 
 function storageClient() {
   const url = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
   if (!url || !serviceRoleKey) {
     throw new Error(
-      'Storage não configurado: faltam as variáveis SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.',
+      'Storage não configurado: faltam as variáveis SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY (ou SUPABASE_SECRET_KEY).',
     );
   }
   return createClient(url, serviceRoleKey, {

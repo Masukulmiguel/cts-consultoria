@@ -154,6 +154,59 @@ describe('uploadEnrollmentDocument', () => {
     ).rejects.toThrow(/Storage não configurado/);
   });
 
+  it('aceita SUPABASE_SECRET_KEY quando não há SUPABASE_SERVICE_ROLE_KEY', async () => {
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', undefined);
+    vi.stubEnv('SUPABASE_SECRET_KEY', 'secret-key');
+
+    await uploadEnrollmentDocument({
+      enrollmentId: 'e1',
+      userId: 'u1',
+      kind: 'BI_FRONT',
+      bytes: jpeg,
+      declaredType: 'image/jpeg',
+    });
+
+    expect(createClientMock).toHaveBeenCalledWith(
+      'https://project.supabase.co',
+      'secret-key',
+      expect.anything(),
+    );
+    expect(uploadMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('prefere SUPABASE_SERVICE_ROLE_KEY quando ambas as chaves existem', async () => {
+    vi.stubEnv('SUPABASE_SECRET_KEY', 'secret-key');
+
+    await uploadEnrollmentDocument({
+      enrollmentId: 'e1',
+      userId: 'u1',
+      kind: 'BI_FRONT',
+      bytes: jpeg,
+      declaredType: 'image/jpeg',
+    });
+
+    expect(createClientMock).toHaveBeenCalledWith(
+      'https://project.supabase.co',
+      'service-role-key',
+      expect.anything(),
+    );
+  });
+
+  it('nomeia as duas chaves na mensagem de storage não configurado', async () => {
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', undefined);
+    vi.stubEnv('SUPABASE_SECRET_KEY', undefined);
+
+    await expect(
+      uploadEnrollmentDocument({
+        enrollmentId: 'e1',
+        userId: 'u1',
+        kind: 'BI_FRONT',
+        bytes: jpeg,
+        declaredType: 'image/jpeg',
+      }),
+    ).rejects.toThrow(/SUPABASE_SERVICE_ROLE_KEY.*SUPABASE_SECRET_KEY/);
+  });
+
   it('propaga o erro do storage', async () => {
     uploadMock.mockResolvedValueOnce({
       data: null,
