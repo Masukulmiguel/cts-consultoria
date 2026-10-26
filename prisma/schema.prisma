@@ -1,0 +1,61 @@
+// Schema Prisma — Fase 3 (fundação técnica).
+// Núcleo: utilizadores, papéis, auditoria.
+// Entidades de negócio (cursos, inscrições, pagamentos, CMS…) seguem docs/08-database-design.md
+// e serão adicionadas nas fases 5–8.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  TRAINING_MANAGER
+  FINANCE
+  STAFF
+  STUDENT
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  passwordHash   String
+  name           String
+  phone          String?
+  role           UserRole  @default(STUDENT)
+  mfaEnabled     Boolean   @default(false)
+  totpSecret     String? // cifrada em repouso (AES-256-GCM via src/lib/crypto.ts)
+  sessionVersion Int       @default(1) // incrementar para revogar todas as sessões
+  emailVerifiedAt DateTime?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  auditLogs AuditLog[]
+
+  @@index([role])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String // ex.: login.success, login.failure, user.role_changed
+  entity    String? // ex.: User, Enrollment
+  entityId  String?
+  metadata  Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}

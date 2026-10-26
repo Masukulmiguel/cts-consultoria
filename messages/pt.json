@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "siteName": "CTS Consultoria Empresarial & Gestão de Negócios",
+    "tagline": "Contabilidade, Fiscalidade e Formação em Luanda"
+  },
+  "nav": {
+    "home": "Início",
+    "about": "Sobre Nós",
+    "services": "Serviços",
+    "training": "Formação",
+    "news": "Notícias",
+    "contact": "Contactos"
+  },
+  "home": {
+    "heroKicker": "Desde 2016 em Luanda",
+    "heroTitle": "Garantir o cumprimento das Obrigações Contabilísticas e Fiscais com as melhores práticas de Gestão.",
+    "heroText": "A CTS Consultoria Empresarial & Gestão de Negócios garante a qualidade rigorosa da informação financeira, com ênfase na conformidade tributária perante a AGT e otimização da gestão empresarial em Angola.",
+    "status": "Website em construção — nova plataforma em desenvolvimento."
+  },
+  "common": {
+    "language": "Idioma",
+    "loading": "A carregar…"
+  },
+  "admin": {
+    "loginTitle": "Área reservada",
+    "loginSubtitle": "Inicie sessão para gerir a plataforma CTS",
+    "email": "E-mail",
+    "password": "Palavra-passe",
+    "totp": "Código MFA",
+    "signIn": "Entrar",
+    "signOut": "Terminar sessão",
+    "invalid": "Credenciais inválidas.",
+    "rateLimited": "Demasiadas tentativas. Aguarde alguns minutos.",
+    "dashboard": "Painel",
+    "welcome": "Sessão iniciada"
+  }
+}

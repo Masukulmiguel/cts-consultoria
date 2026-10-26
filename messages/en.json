@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "siteName": "CTS Business Consulting & Management",
+    "tagline": "Accounting, Tax and Training in Luanda"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "training": "Training",
+    "news": "News",
+    "contact": "Contact"
+  },
+  "home": {
+    "heroKicker": "Since 2016 in Luanda",
+    "heroTitle": "Ensuring compliance with Accounting and Tax obligations through best Management practices.",
+    "heroText": "CTS Business Consulting & Management ensures rigorous quality of financial information, with an emphasis on tax compliance with the AGT and business management optimization in Angola.",
+    "status": "Website under construction — new platform in development."
+  },
+  "common": {
+    "language": "Language",
+    "loading": "Loading…"
+  },
+  "admin": {
+    "loginTitle": "Private area",
+    "loginSubtitle": "Sign in to manage the CTS platform",
+    "email": "Email",
+    "password": "Password",
+    "totp": "MFA code",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "invalid": "Invalid credentials.",
+    "rateLimited": "Too many attempts. Please wait a few minutes.",
+    "dashboard": "Dashboard",
+    "welcome": "Signed in"
+  }
+}

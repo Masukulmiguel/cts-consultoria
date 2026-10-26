@@ -1,0 +1,39 @@
+# Dependências
+node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Produção
+build/
+dist/
+
+# Variáveis de ambiente (nunca versionar)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Base de dados (migrações SQL geradas localmente podem ser versionadas; nunca dados)
+*.db
+*.sqlite
+
+# Testes e cobertura
+coverage/
+
+# Editor / SO
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Vercel
+.vercel
+*.tsbuildinfo
