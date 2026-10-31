@@ -2,6 +2,7 @@ import { PageHero } from '@/components/page-hero';
 import { Reveal } from '@/components/scroll/reveal';
 import { TiltCard } from '@/components/scroll/tilt-card';
 import { trainingFamilies } from '@/content/services';
+import { getPublicCourses } from '@/lib/content-db';
 import { localePath } from '@/lib/site';
 import { ArrowRight, Award, CheckCircle2, GraduationCap } from 'lucide-react';
 import Image from 'next/image';
@@ -22,8 +23,9 @@ const FLYERS = [
   { src: '/training/campanha-dia-da-mulher.jpg', label: 'Campanha Dia da Mulher' },
 ];
 
-export function TrainingView({ locale }: { locale: 'pt' | 'en' }) {
+export async function TrainingView({ locale }: { locale: 'pt' | 'en' }) {
   const isPt = locale === 'pt';
+  const courses = await getPublicCourses();
 
   return (
     <>
@@ -96,6 +98,79 @@ export function TrainingView({ locale }: { locale: 'pt' | 'en' }) {
           </div>
         </div>
       </section>
+
+      {courses.length > 0 ? (
+        <section className="section-y bg-surface">
+          <div className="shell">
+            <Reveal>
+              <p className="eyebrow">{isPt ? 'Cursos publicados' : 'Published courses'}</p>
+              <h2 className="heading-lg mt-5 max-w-2xl">
+                {isPt ? 'Programas disponíveis para inscrição' : 'Programmes open for enrolment'}
+              </h2>
+            </Reveal>
+
+            <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {courses.map((course, index) => (
+                <Reveal key={course.id} delay={index * 0.04}>
+                  <TiltCard className="h-full" max={2}>
+                    <article className="card card-hover flex h-full flex-col overflow-hidden">
+                      {course.imageUrl ? (
+                        <div className="relative aspect-3/4 overflow-hidden bg-surface-muted">
+                          <Image
+                            src={course.imageUrl}
+                            alt={course.title[locale]}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                          />
+                        </div>
+                      ) : null}
+                      <div className="flex flex-1 flex-col p-7">
+                        <span className="inline-flex w-fit rounded-pill bg-primary-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.14em] text-primary-700">
+                          {course.level ?? course.family}
+                        </span>
+                        <h3 className="mt-4 font-display text-lg font-semibold leading-snug text-ink">
+                          {course.title[locale]}
+                        </h3>
+                        <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-secondary">
+                          {course.summary[locale]}
+                        </p>
+                        {course.duration || course.price ? (
+                          <dl className="mt-5 flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-4 text-xs">
+                            {course.duration ? (
+                              <div>
+                                <dt className="uppercase tracking-[0.14em] text-ink-muted">
+                                  {isPt ? 'Duração' : 'Duration'}
+                                </dt>
+                                <dd className="mt-1 font-semibold text-ink">{course.duration}</dd>
+                              </div>
+                            ) : null}
+                            {course.price ? (
+                              <div>
+                                <dt className="uppercase tracking-[0.14em] text-ink-muted">
+                                  {isPt ? 'Investimento' : 'Fee'}
+                                </dt>
+                                <dd className="mt-1 font-semibold text-ink">{course.price}</dd>
+                              </div>
+                            ) : null}
+                          </dl>
+                        ) : null}
+                        <Link
+                          href={`${localePath(locale, 'contact')}#contacto`}
+                          className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 transition-colors hover:text-accent-600"
+                        >
+                          {isPt ? 'Inscrever-se' : 'Enrol now'}
+                          <ArrowRight size={15} />
+                        </Link>
+                      </div>
+                    </article>
+                  </TiltCard>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="section-y bg-surface">
         <div className="shell">

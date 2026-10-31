@@ -71,3 +71,81 @@ model AuditLog {
   @@index([userId, createdAt])
   @@index([action, createdAt])
 }
+
+/// Serviço de consultoria publicado no website (CRUD no admin).
+model Service {
+  id          String   @id @default(cuid())
+  slugPt      String   @unique
+  slugEn      String   @unique
+  titlePt     String
+  titleEn     String
+  categoryPt  String
+  categoryEn  String
+  summaryPt   String
+  summaryEn   String
+  bulletsPt   String[] @default([])
+  bulletsEn   String[] @default([])
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+/// Curso da CTS Academia (CRUD no admin).
+model Course {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  titleEn     String?
+  family      String
+  summary     String
+  summaryEn   String?
+  level       String?
+  duration    String?
+  price       String?
+  brochureUrl String?
+  imageUrl    String?
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+/// Notícia ou artigo (CRUD no admin).
+model NewsPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  titleEn     String?
+  excerpt     String
+  excerptEn   String?
+  body        String
+  bodyEn      String?
+  category    String?
+  imageUrl    String?
+  published   Boolean  @default(true)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, publishedAt])
+}
+
+/// Pergunta frequente (CRUD no admin).
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  questionEn String?
+  answer    String
+  answerEn  String?
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}

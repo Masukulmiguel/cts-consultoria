@@ -9,15 +9,18 @@ import {
   company,
   facts,
   mission,
-  services,
   taglineLong,
   trainingFamilies,
 } from '@/content/services';
+import { getPublicFaqs, getPublicServices } from '@/lib/content-db';
 import { localePath } from '@/lib/site';
-import { ArrowRight, Award, CheckCircle2, ShieldCheck, Users } from 'lucide-react';
+import { ArrowRight, Award, CheckCircle2, Plus, ShieldCheck, Users } from 'lucide-react';
 import { setRequestLocale } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
+
+/** Os conteúdos vêm da base de dados; revalida a cada 60 segundos. */
+export const revalidate = 60;
 
 const GALLERY = [
   {
@@ -67,6 +70,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
   const { locale } = await params;
   setRequestLocale(locale);
   const isPt = locale === 'pt';
+  const services = await getPublicServices();
+  const faqs = await getPublicFaqs();
 
   return (
     <>
@@ -333,6 +338,41 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
         </div>
       </section>
 
+      {faqs.length > 0 ? (
+        <section className="section-y bg-surface-muted">
+          <div className="shell">
+            <Reveal>
+              <p className="eyebrow">
+                {isPt ? 'Perguntas frequentes' : 'Frequently asked questions'}
+              </p>
+              <h2 className="heading-lg mt-5 max-w-2xl">
+                {isPt
+                  ? 'As dúvidas que nos chegam mais souvent'
+                  : 'The questions we hear most often'}
+              </h2>
+            </Reveal>
+
+            <div className="mt-12 grid gap-5 md:grid-cols-2">
+              {faqs.map((faq, index) => (
+                <Reveal key={faq.id} delay={index * 0.04}>
+                  <details className="card card-hover group h-full p-7">
+                    <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-display text-lg font-semibold text-ink marker:hidden">
+                      {faq.question[locale]}
+                      <span className="mt-1 shrink-0 text-primary-600 transition-transform duration-200 group-open:rotate-45">
+                        <Plus size={18} />
+                      </span>
+                    </summary>
+                    <p className="mt-4 text-sm leading-relaxed text-ink-secondary">
+                      {faq.answer[locale]}
+                    </p>
+                  </details>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="section-y bg-surface">
         <div className="shell">
           <Reveal>
@@ -409,6 +449,21 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
                 provider: { '@id': `${company.site}/#organization` },
                 areaServed: 'AO',
               })),
+              ...(faqs.length > 0
+                ? [
+                    {
+                      '@type': 'FAQPage',
+                      mainEntity: faqs.map((faq) => ({
+                        '@type': 'Question',
+                        name: faq.question[locale],
+                        acceptedAnswer: {
+                          '@type': 'Answer',
+                          text: faq.answer[locale],
+                        },
+                      })),
+                    },
+                  ]
+                : []),
             ],
           }),
         }}

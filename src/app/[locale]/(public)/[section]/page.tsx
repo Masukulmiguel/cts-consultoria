@@ -8,6 +8,9 @@ import type { Locale } from '@/i18n/routing';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
+/** Os conteúdos vêm da base de dados; revalida a cada 60 segundos. */
+export const revalidate = 60;
+
 export function generateStaticParams() {
   return allSectionParams();
 }

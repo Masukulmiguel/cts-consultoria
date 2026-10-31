@@ -18,6 +18,16 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [{ label: 'Visão geral', href: '/pt/admin/dashboard', icon: 'LayoutDashboard' }],
   },
   {
+    label: 'Conteúdos',
+    icon: 'FileText',
+    items: [
+      { label: 'Serviços', href: '/pt/admin/services', icon: 'Briefcase' },
+      { label: 'Cursos', href: '/pt/admin/courses', icon: 'GraduationCap' },
+      { label: 'Notícias', href: '/pt/admin/news', icon: 'Newspaper' },
+      { label: 'FAQs', href: '/pt/admin/faqs', icon: 'MessageSquare' },
+    ],
+  },
+  {
     label: 'Website',
     icon: 'Globe',
     items: [
@@ -28,21 +38,10 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     ],
   },
   {
-    label: 'Conteúdos',
-    icon: 'FileText',
-    items: [
-      { label: 'Serviços', href: '/pt/admin/conteudos/servicos', icon: 'Briefcase' },
-      { label: 'Notícias', href: '/pt/admin/conteudos/noticias', icon: 'Newspaper' },
-      { label: 'FAQs', href: '/pt/admin/conteudos/faqs', icon: 'MessageSquare' },
-      { label: 'Parceiros', href: '/pt/admin/conteudos/parceiros', icon: 'Handshake' },
-      { label: 'Galeria', href: '/pt/admin/conteudos/galeria', icon: 'Images' },
-    ],
-  },
-  {
     label: 'Serviços',
     icon: 'Briefcase',
     items: [
-      { label: 'Todos os serviços', href: '/pt/admin/servicos', icon: 'Briefcase' },
+      { label: 'Todos os serviços', href: '/pt/admin/services', icon: 'Briefcase' },
       { label: 'Pedidos de serviço', href: '/pt/admin/servicos/pedidos', icon: 'ClipboardList' },
     ],
   },
@@ -50,7 +49,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     label: 'Formação',
     icon: 'GraduationCap',
     items: [
-      { label: 'Cursos', href: '/pt/admin/formacao/cursos', icon: 'GraduationCap' },
+      { label: 'Cursos', href: '/pt/admin/courses', icon: 'GraduationCap' },
       { label: 'Turmas e sessões', href: '/pt/admin/formacao/turmas', icon: 'Calendar' },
       { label: 'Panfletos', href: '/pt/admin/formacao/panfletos', icon: 'Presentation' },
     ],

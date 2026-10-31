@@ -1,13 +1,14 @@
 import { PageHero } from '@/components/page-hero';
 import { Reveal } from '@/components/scroll/reveal';
 import { TiltCard } from '@/components/scroll/tilt-card';
-import { services } from '@/content/services';
+import { getPublicServices } from '@/lib/content-db';
 import { localePath } from '@/lib/site';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
-export function ServicesView({ locale }: { locale: 'pt' | 'en' }) {
+export async function ServicesView({ locale }: { locale: 'pt' | 'en' }) {
   const isPt = locale === 'pt';
+  const services = await getPublicServices();
 
   return (
     <>

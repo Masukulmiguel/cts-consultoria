@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { answerMessage } from '@/content/chatbot';
+import { describe, expect, it } from 'vitest';
 
 describe('answerMessage', () => {
   it('responde a saudacoes em portugues', () => {

@@ -1,11 +1,20 @@
 import { PageHero } from '@/components/page-hero';
 import { Reveal } from '@/components/scroll/reveal';
-import { company, services } from '@/content/services';
+import { company } from '@/content/services';
+import type { PublicService } from '@/lib/content-db';
 import { localePath, sectionPath } from '@/lib/site';
 import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
-export function ServiceDetailView({ locale, slug }: { locale: 'pt' | 'en'; slug: string }) {
+export function ServiceDetailView({
+  locale,
+  slug,
+  services,
+}: {
+  locale: 'pt' | 'en';
+  slug: string;
+  services: PublicService[];
+}) {
   const isPt = locale === 'pt';
   const service = services.find((s) => s.slug[locale] === slug);
   if (!service) return null;
