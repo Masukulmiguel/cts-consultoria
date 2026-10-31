@@ -1,5 +1,6 @@
 import { ResourceForm } from '@/components/admin/resource-form';
 import type { Locale } from '@/i18n/routing';
+import { relationOptions } from '@/lib/admin/content-repo';
 import { RESOURCES, isResourceKey } from '@/lib/admin/resources';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -13,6 +14,16 @@ export default async function ResourceCreatePage({
   if (!isResourceKey(resource)) notFound();
   const def = RESOURCES[resource];
 
+  const sources = [...new Set(def.fields.map((field) => field.relation).filter(Boolean))] as (
+    | 'users'
+    | 'courses'
+  )[];
+  const options = Object.fromEntries(
+    await Promise.all(
+      sources.map(async (source) => [source, await relationOptions(source)] as const),
+    ),
+  );
+
   return (
     <div className="space-y-6">
       <header>
@@ -25,7 +36,7 @@ export default async function ResourceCreatePage({
         <h1 className="mt-2 font-display text-2xl font-bold text-white">Novo {def.singular}</h1>
       </header>
 
-      <ResourceForm resource={def} locale={locale} />
+      <ResourceForm resource={def} locale={locale} relationOptions={options} />
     </div>
   );
 }

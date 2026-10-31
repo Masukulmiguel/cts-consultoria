@@ -10,6 +10,7 @@ export type ResourceFormProps = {
   resource: ResourceDef;
   record?: Record<string, unknown>;
   locale: string;
+  relationOptions?: Record<string, { value: string; label: string }[]>;
 };
 
 function initialValue(field: { name: string; type: string }, record?: Record<string, unknown>) {
@@ -22,7 +23,7 @@ function initialValue(field: { name: string; type: string }, record?: Record<str
   return String(value);
 }
 
-export function ResourceForm({ resource, record, locale }: ResourceFormProps) {
+export function ResourceForm({ resource, record, locale, relationOptions }: ResourceFormProps) {
   const [state, formAction, pending] = useActionState(saveResource, INITIAL_CONTENT_STATE);
   const [removeState, removeAction, removing] = useActionState(
     removeResource,
@@ -61,6 +62,23 @@ export function ResourceForm({ resource, record, locale }: ResourceFormProps) {
                     />
                     Visível no site
                   </label>
+                ) : field.type === 'select' || field.type === 'relation' ? (
+                  <select
+                    id={inputId}
+                    name={field.name}
+                    defaultValue={value as string}
+                    className="mt-2 w-full rounded-lg border border-[#1c2c49] bg-[#0d1729] px-3 py-2 text-sm text-white focus:border-primary-500 focus:outline-none"
+                  >
+                    <option value="">{field.required ? 'Seleccionar…' : '—'}</option>
+                    {(field.type === 'select'
+                      ? (field.options ?? [])
+                      : (relationOptions?.[field.relation ?? 'users'] ?? [])
+                    ).map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 ) : field.type === 'textarea' ? (
                   <textarea
                     id={inputId}

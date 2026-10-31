@@ -1,6 +1,6 @@
 import { ResourceForm } from '@/components/admin/resource-form';
 import type { Locale } from '@/i18n/routing';
-import { getRow } from '@/lib/admin/content-repo';
+import { getRow, relationOptions } from '@/lib/admin/content-repo';
 import { RESOURCES, isResourceKey } from '@/lib/admin/resources';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -16,6 +16,16 @@ export default async function ResourceEditPage({
   const record = await getRow(resource, id);
   if (!record) notFound();
 
+  const sources = [...new Set(def.fields.map((field) => field.relation).filter(Boolean))] as (
+    | 'users'
+    | 'courses'
+  )[];
+  const options = Object.fromEntries(
+    await Promise.all(
+      sources.map(async (source) => [source, await relationOptions(source)] as const),
+    ),
+  );
+
   return (
     <div className="space-y-6">
       <header>
@@ -28,7 +38,7 @@ export default async function ResourceEditPage({
         <h1 className="mt-2 font-display text-2xl font-bold text-white">Editar {def.singular}</h1>
       </header>
 
-      <ResourceForm resource={def} record={record} locale={locale} />
+      <ResourceForm resource={def} record={record} locale={locale} relationOptions={options} />
     </div>
   );
 }

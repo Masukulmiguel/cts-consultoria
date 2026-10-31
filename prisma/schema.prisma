@@ -43,6 +43,7 @@ model User {
 
   auditLogs     AuditLog[]
   handledMessages ContactMessage[]
+  enrollments   Enrollment[]
 
   @@index([role])
 }
@@ -53,6 +54,7 @@ enum UserRole {
   CONTENT
   INSTRUCTOR
   SUPPORT
+  STUDENT
 }
 
 model AuditLog {
@@ -112,6 +114,9 @@ model Course {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  enrollments Enrollment[]
+  materials   Material[]
+
   @@index([published, order])
 }
 
@@ -137,15 +142,87 @@ model NewsPost {
 
 /// Pergunta frequente (CRUD no admin).
 model Faq {
-  id        String   @id @default(cuid())
-  question  String
+  id         String   @id @default(cuid())
+  question   String
   questionEn String?
-  answer    String
-  answerEn  String?
+  answer     String
+  answerEn   String?
+  order      Int      @default(0)
+  published  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+/// Inscrição de um formando num curso.
+model Enrollment {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  status    EnrollmentStatus @default(PENDING)
+  progress  Int              @default(0)
+  notes     String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  attendances  Attendance[]
+  certificates Certificate[]
+
+  @@unique([userId, courseId])
+  @@index([status])
+  @@index([userId])
+}
+
+enum EnrollmentStatus {
+  PENDING
+  PAID
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+/// Material de apoio de um curso (apenas leitura pelo formando).
+model Material {
+  id        String   @id @default(cuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title     String
+  type      String   @default("document")
+  url       String
   order     Int      @default(0)
   published Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([published, order])
+  @@index([courseId, order])
+}
+
+/// Presença de um formando numa sessão.
+model Attendance {
+  id           String     @id @default(cuid())
+  enrollmentId String
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  session      String
+  date         DateTime
+  present      Boolean    @default(true)
+  notes        String?
+  createdAt    DateTime   @default(now())
+
+  @@index([enrollmentId, date])
+}
+
+/// Certificado emitido no final da formação.
+model Certificate {
+  id           String     @id @default(cuid())
+  enrollmentId String
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  code         String     @unique
+  issuedAt     DateTime   @default(now())
+  url          String?
+  createdAt    DateTime   @default(now())
+
+  @@index([enrollmentId])
 }

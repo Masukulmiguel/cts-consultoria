@@ -50,6 +50,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     icon: 'GraduationCap',
     items: [
       { label: 'Cursos', href: '/pt/admin/courses', icon: 'GraduationCap' },
+      { label: 'Materiais', href: '/pt/admin/materials', icon: 'Presentation' },
       { label: 'Turmas e sessões', href: '/pt/admin/formacao/turmas', icon: 'Calendar' },
       { label: 'Panfletos', href: '/pt/admin/formacao/panfletos', icon: 'Presentation' },
     ],
@@ -58,8 +59,8 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     label: 'Inscrições',
     icon: 'ClipboardList',
     items: [
-      { label: 'Todas as inscrições', href: '/pt/admin/inscricoes', icon: 'ClipboardList' },
-      { label: 'Aguardam pagamento', href: '/pt/admin/inscricoes?estado=pendente', icon: 'Clock' },
+      { label: 'Todas as inscrições', href: '/pt/admin/enrollments', icon: 'ClipboardList' },
+      { label: 'Aguardam pagamento', href: '/pt/admin/enrollments?estado=pendente', icon: 'Clock' },
       { label: 'Certificados', href: '/pt/admin/inscricoes/certificados', icon: 'Award' },
     ],
   },

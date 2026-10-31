@@ -159,6 +159,101 @@ async function main() {
   await seedServices();
   await seedCourses();
   await seedFaqs();
+  await seedStudent();
+}
+
+/** Formando de demonstração com inscrição, materiais e certificado. */
+async function seedStudent() {
+  const email = process.env.SEED_STUDENT_EMAIL;
+  const password = process.env.SEED_STUDENT_PASSWORD;
+
+  if (!email || !password) {
+    console.log('[seed] SEED_STUDENT_EMAIL/PASSWORD não definidos — formando ignorado.');
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+  const student = await prisma.user.upsert({
+    where: { email },
+    update: { passwordHash, role: 'STUDENT' },
+    create: {
+      email,
+      name: 'Formando de Demonstração',
+      passwordHash,
+      role: 'STUDENT',
+    },
+  });
+
+  const course = await prisma.course.findFirst({ orderBy: { order: 'asc' } });
+  if (!course) return;
+
+  const enrollment = await prisma.enrollment.upsert({
+    where: { userId_courseId: { userId: student.id, courseId: course.id } },
+    update: { status: 'CONFIRMED', progress: 65 },
+    create: {
+      userId: student.id,
+      courseId: course.id,
+      status: 'CONFIRMED',
+      progress: 65,
+    },
+  });
+
+  await prisma.material.upsert({
+    where: { id: 'seed-material-1' },
+    update: {},
+    create: {
+      id: 'seed-material-1',
+      courseId: course.id,
+      title: 'Plano de formação — módulo introdutório',
+      type: 'document',
+      url: '/training/flyer-1.jpg',
+      order: 1,
+      published: true,
+    },
+  });
+
+  await prisma.material.upsert({
+    where: { id: 'seed-material-2' },
+    update: {},
+    create: {
+      id: 'seed-material-2',
+      courseId: course.id,
+      title: 'Aula inaugural em vídeo',
+      type: 'video',
+      url: '/training/flyer-2.jpg',
+      order: 2,
+      published: true,
+    },
+  });
+
+  const attendanceCount = await prisma.attendance.count({
+    where: { enrollmentId: enrollment.id },
+  });
+  if (attendanceCount === 0) {
+    await prisma.attendance.createMany({
+      data: [1, 2, 3].map((session) => ({
+        enrollmentId: enrollment.id,
+        session: `Sessão ${session}`,
+        date: new Date(2026, 9, session + 1),
+        present: session !== 3,
+      })),
+    });
+  }
+
+  const certificate = await prisma.certificate.findUnique({
+    where: { code: 'CTS-2026-0001' },
+  });
+  if (!certificate) {
+    await prisma.certificate.create({
+      data: {
+        enrollmentId: enrollment.id,
+        code: 'CTS-2026-0001',
+        issuedAt: new Date(2026, 8, 30),
+      },
+    });
+  }
+
+  console.log(`[seed] Formando de demonstração pronto: ${student.email}`);
 }
 
 main()

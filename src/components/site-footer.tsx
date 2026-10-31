@@ -103,6 +103,11 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link href={`/${locale}/aluno`} className="transition-colors hover:text-white">
+                {locale === 'pt' ? 'Área do formando' : 'Student area'}
+              </Link>
+            </li>
           </ul>
         </nav>
 

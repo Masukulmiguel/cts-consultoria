@@ -1,6 +1,16 @@
-export type ResourceKey = 'services' | 'courses' | 'news' | 'faqs';
+export type ResourceKey = 'services' | 'courses' | 'news' | 'faqs' | 'enrollments' | 'materials';
 
-export type FieldType = 'text' | 'textarea' | 'lines' | 'number' | 'boolean' | 'date';
+export type FieldType =
+  | 'text'
+  | 'textarea'
+  | 'lines'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'select'
+  | 'relation';
+
+export type RelationSource = 'users' | 'courses';
 
 export type ResourceField = {
   name: string;
@@ -10,6 +20,8 @@ export type ResourceField = {
   placeholder?: string;
   help?: string;
   full?: boolean;
+  options?: { value: string; label: string }[];
+  relation?: RelationSource;
 };
 
 export type ResourceColumn = {
@@ -21,7 +33,7 @@ export type ResourceDef = {
   key: ResourceKey;
   label: string;
   singular: string;
-  model: 'service' | 'course' | 'newsPost' | 'faq';
+  model: 'service' | 'course' | 'newsPost' | 'faq' | 'enrollment' | 'material';
   titleField: string;
   slugField?: string;
   columns: ResourceColumn[];
@@ -152,6 +164,95 @@ export const RESOURCES: Record<ResourceKey, ResourceDef> = {
       { name: 'questionEn', label: 'Pergunta (EN)', type: 'text', full: true },
       { name: 'answer', label: 'Resposta', type: 'textarea', required: true, full: true },
       { name: 'answerEn', label: 'Resposta (EN)', type: 'textarea', full: true },
+      { name: 'order', label: 'Ordem', type: 'number' },
+      { name: 'published', label: 'Publicado', type: 'boolean' },
+    ],
+  },
+  enrollments: {
+    key: 'enrollments',
+    label: 'Inscrições',
+    singular: 'inscrição',
+    model: 'enrollment',
+    titleField: 'userId',
+    columns: [
+      { name: 'userId', label: 'Formando' },
+      { name: 'courseId', label: 'Curso' },
+      { name: 'status', label: 'Estado' },
+      { name: 'progress', label: 'Progresso' },
+    ],
+    fields: [
+      {
+        name: 'userId',
+        label: 'Formando',
+        type: 'relation',
+        relation: 'users',
+        required: true,
+        full: true,
+      },
+      {
+        name: 'courseId',
+        label: 'Curso',
+        type: 'relation',
+        relation: 'courses',
+        required: true,
+        full: true,
+      },
+      {
+        name: 'status',
+        label: 'Estado',
+        type: 'select',
+        required: true,
+        options: [
+          { value: 'PENDING', label: 'Aguarda pagamento' },
+          { value: 'PAID', label: 'Pago' },
+          { value: 'CONFIRMED', label: 'Confirmada' },
+          { value: 'COMPLETED', label: 'Concluída' },
+          { value: 'CANCELLED', label: 'Cancelada' },
+        ],
+      },
+      {
+        name: 'progress',
+        label: 'Progresso (%)',
+        type: 'number',
+        help: 'Percentagem concluída, entre 0 e 100.',
+      },
+      { name: 'notes', label: 'Notas internas', type: 'textarea', full: true },
+    ],
+  },
+  materials: {
+    key: 'materials',
+    label: 'Materiais',
+    singular: 'material',
+    model: 'material',
+    titleField: 'title',
+    columns: [
+      { name: 'title', label: 'Material' },
+      { name: 'courseId', label: 'Curso' },
+      { name: 'type', label: 'Tipo' },
+      { name: 'published', label: 'Publicado' },
+    ],
+    fields: [
+      { name: 'title', label: 'Título', type: 'text', required: true, full: true },
+      {
+        name: 'courseId',
+        label: 'Curso',
+        type: 'relation',
+        relation: 'courses',
+        required: true,
+        full: true,
+      },
+      {
+        name: 'type',
+        label: 'Tipo',
+        type: 'select',
+        options: [
+          { value: 'document', label: 'Documento' },
+          { value: 'slides', label: 'Apresentação' },
+          { value: 'video', label: 'Vídeo' },
+          { value: 'link', label: 'Ligação' },
+        ],
+      },
+      { name: 'url', label: 'URL', type: 'text', required: true, full: true },
       { name: 'order', label: 'Ordem', type: 'number' },
       { name: 'published', label: 'Publicado', type: 'boolean' },
     ],

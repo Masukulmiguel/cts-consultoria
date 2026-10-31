@@ -14,6 +14,33 @@ export default async function ResourceListPage({
   const def = RESOURCES[resource];
   const rows = await listRows(resource);
 
+  const display = (row: Record<string, unknown>, column: string): string => {
+    if (column === 'published') return row.published === true ? 'Sim' : 'Não';
+    if (column === 'publishedAt')
+      return row.publishedAt instanceof Date ? row.publishedAt.toLocaleDateString('pt-PT') : '';
+    if (column === 'userId') {
+      const user = row.user as { name?: string; email?: string } | undefined;
+      return user?.name ?? user?.email ?? String(row.userId ?? '—');
+    }
+    if (column === 'courseId') {
+      const course = row.course as { title?: string } | undefined;
+      return course?.title ?? String(row.courseId ?? '—');
+    }
+    if (column === 'status') {
+      const labels: Record<string, string> = {
+        PENDING: 'Aguarda pagamento',
+        PAID: 'Pago',
+        CONFIRMED: 'Confirmada',
+        COMPLETED: 'Concluída',
+        CANCELLED: 'Cancelada',
+      };
+      const value = String(row.status ?? '');
+      return labels[value] ?? value;
+    }
+    if (column === 'progress') return `${String(row.progress ?? 0)}%`;
+    return String(row[column] ?? '—');
+  };
+
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -61,15 +88,7 @@ export default async function ResourceListPage({
                 <tr key={row.id} className="transition-colors hover:bg-[#111e35]">
                   {def.columns.map((column) => (
                     <td key={column.name} className="px-4 py-3 text-white/80">
-                      {column.name === 'published'
-                        ? row.published === true
-                          ? 'Sim'
-                          : 'Não'
-                        : column.name === 'publishedAt'
-                          ? row.publishedAt instanceof Date
-                            ? row.publishedAt.toLocaleDateString('pt-PT')
-                            : ''
-                          : String(row[column.name] ?? '—')}
+                      {display(row, column.name)}
                     </td>
                   ))}
                   <td className="px-4 py-3 text-right">

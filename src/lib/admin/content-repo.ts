@@ -40,6 +40,16 @@ export async function listRows(key: ResourceKey): Promise<ResourceRow[]> {
       return prisma.faq.findMany({
         orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
       }) as Promise<ResourceRow[]>;
+    case 'enrollments':
+      return prisma.enrollment.findMany({
+        include: { user: true, course: true },
+        orderBy: { createdAt: 'desc' },
+      }) as Promise<ResourceRow[]>;
+    case 'materials':
+      return prisma.material.findMany({
+        include: { course: true },
+        orderBy: [{ courseId: 'asc' }, { order: 'asc' }],
+      }) as Promise<ResourceRow[]>;
   }
 }
 
@@ -53,6 +63,10 @@ export async function getRow(key: ResourceKey, id: string): Promise<ResourceRow 
       return (await prisma.newsPost.findUnique({ where: { id } })) as ResourceRow | null;
     case 'faqs':
       return (await prisma.faq.findUnique({ where: { id } })) as ResourceRow | null;
+    case 'enrollments':
+      return (await prisma.enrollment.findUnique({ where: { id } })) as ResourceRow | null;
+    case 'materials':
+      return (await prisma.material.findUnique({ where: { id } })) as ResourceRow | null;
   }
 }
 
@@ -66,6 +80,10 @@ export async function createRow(key: ResourceKey, data: ResourceData): Promise<R
       return (await prisma.newsPost.create({ data: data as never })) as ResourceRow;
     case 'faqs':
       return (await prisma.faq.create({ data: data as never })) as ResourceRow;
+    case 'enrollments':
+      return (await prisma.enrollment.create({ data: data as never })) as ResourceRow;
+    case 'materials':
+      return (await prisma.material.create({ data: data as never })) as ResourceRow;
   }
 }
 
@@ -83,6 +101,13 @@ export async function updateRow(
       return (await prisma.newsPost.update({ where: { id }, data: data as never })) as ResourceRow;
     case 'faqs':
       return (await prisma.faq.update({ where: { id }, data: data as never })) as ResourceRow;
+    case 'enrollments':
+      return (await prisma.enrollment.update({
+        where: { id },
+        data: data as never,
+      })) as ResourceRow;
+    case 'materials':
+      return (await prisma.material.update({ where: { id }, data: data as never })) as ResourceRow;
   }
 }
 
@@ -99,5 +124,36 @@ export async function deleteRow(key: ResourceKey, id: string): Promise<void> {
       return;
     case 'faqs':
       await prisma.faq.delete({ where: { id } });
+      return;
+    case 'enrollments':
+      await prisma.enrollment.delete({ where: { id } });
+      return;
+    case 'materials':
+      await prisma.material.delete({ where: { id } });
   }
+}
+
+/** Opções para campos de relação (formandos e cursos). */
+export async function relationOptions(
+  source: 'users' | 'courses',
+): Promise<{ value: string; label: string }[]> {
+  if (source === 'users') {
+    const users = await prisma.user.findMany({
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, email: true, role: true },
+    });
+    return users.map((user) => ({
+      value: user.id,
+      label: `${user.name ?? user.email} · ${user.email}`,
+    }));
+  }
+
+  const courses = await prisma.course.findMany({
+    orderBy: [{ order: 'asc' }, { title: 'asc' }],
+    select: { id: true, title: true, level: true },
+  });
+  return courses.map((course) => ({
+    value: course.id,
+    label: course.level ? `${course.title} · ${course.level}` : course.title,
+  }));
 }

@@ -49,6 +49,10 @@ function buildPayload(
       case 'date':
         data[field.name] = value ? new Date(value) : new Date();
         break;
+      case 'select':
+      case 'relation':
+        data[field.name] = value === '' ? null : value;
+        break;
       default:
         data[field.name] = value === '' ? null : value;
     }
