@@ -32,8 +32,8 @@ export async function checkCredentials(input: {
   }
 
   const user = await prisma.user.findFirst({
-    where: { email, deletedAt: null, isActive: true },
-    select: { id: true, passwordHash: true, mfaEnabled: true },
+    where: { email },
+    select: { id: true, passwordHash: true, totpEnabled: true },
   });
 
   if (!user) {
@@ -47,5 +47,5 @@ export async function checkCredentials(input: {
     return 'invalid';
   }
 
-  return user.mfaEnabled ? 'mfa' : 'ok';
+  return user.totpEnabled ? 'mfa' : 'ok';
 }

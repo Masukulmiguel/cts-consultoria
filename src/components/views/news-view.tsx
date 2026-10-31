@@ -1,36 +1,60 @@
-import { Reveal } from '@/components/reveal';
-import { ButtonLink } from '@/components/ui/button-link';
-import { type Locale, localePath } from '@/lib/site';
+import { PageHero } from '@/components/page-hero';
+import { Reveal } from '@/components/scroll/reveal';
+import { localePath } from '@/lib/site';
+import { ArrowRight, Newspaper } from 'lucide-react';
+import Link from 'next/link';
 
-export function NewsView({ locale }: { locale: Locale }) {
+export function NewsView({ locale }: { locale: 'pt' | 'en' }) {
+  const isPt = locale === 'pt';
+
   return (
     <>
-      <Reveal>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-red">
-          {locale === 'pt' ? 'Notícias e Recursos' : 'News & Resources'}
-        </p>
-        <h1 className="mt-4 text-4xl font-semibold text-ink">
-          {locale === 'pt' ? 'Actualidade da CTS' : 'CTS Updates'}
-        </h1>
-      </Reveal>
-      <Reveal delay={0.1}>
-        {/* Estado vazio honesto — o conteúdo será publicado pela administração (Fase 6) */}
-        <div className="mt-12 rounded-lg border border-dashed border-gray-300 bg-surface p-12 text-center">
-          <p className="text-lg font-medium text-ink">
-            {locale === 'pt' ? 'Ainda não há publicações.' : 'No posts yet.'}
-          </p>
-          <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
-            {locale === 'pt'
-              ? 'Artigos, notícias e recursos sobre contabilidade, fiscalidade e gestão empresarial em Angola serão publicados aqui.'
-              : 'Articles, news and resources about accounting, tax and business management in Angola will be published here.'}
-          </p>
-          <div className="mt-6">
-            <ButtonLink href={localePath(locale, 'contact')} variant="outline">
-              {locale === 'pt' ? 'Falar connosco' : 'Contact us'}
-            </ButtonLink>
-          </div>
+      <PageHero
+        eyebrow={isPt ? 'Notícias e recursos' : 'News & resources'}
+        title={isPt ? 'Actualidade da CTS' : 'CTS updates'}
+        lede={
+          isPt
+            ? 'Espaço dedicado a artigos, notícias e recursos sobre contabilidade, fiscalidade e gestão empresarial em Angola.'
+            : 'A dedicated space for articles, news and resources on accounting, tax and business management in Angola.'
+        }
+      />
+
+      <section className="section-y bg-surface-muted">
+        <div className="shell">
+          <Reveal>
+            <div className="card overflow-hidden">
+              <div className="grid gap-0 md:grid-cols-[0.9fr_1.1fr]">
+                <div className="flex items-center justify-center bg-ink px-8 py-14">
+                  <Newspaper size={64} className="text-white/20" strokeWidth={1.25} />
+                </div>
+                <div className="p-9 lg:p-12">
+                  <p className="eyebrow">{isPt ? 'Em preparação' : 'Coming soon'}</p>
+                  <h2 className="heading-md mt-5">
+                    {isPt ? 'Ainda não há publicações.' : 'No posts yet.'}
+                  </h2>
+                  <p className="lede mt-5">
+                    {isPt
+                      ? 'Artigos, notícias e recursos sobre contabilidade, fiscalidade e gestão empresarial em Angola serão publicados aqui pela equipa CTS.'
+                      : 'Articles, news and resources on accounting, tax and business management in Angola will be published here by the CTS team.'}
+                  </p>
+                  <div className="mt-8 flex flex-wrap gap-3">
+                    <Link
+                      href={`${localePath(locale, 'contact')}#contacto`}
+                      className="btn-primary"
+                    >
+                      {isPt ? 'Falar connosco' : 'Contact us'}
+                      <ArrowRight size={17} />
+                    </Link>
+                    <Link href={localePath(locale, 'about')} className="btn-outline">
+                      {isPt ? 'Conhecer a CTS' : 'Get to know CTS'}
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
-      </Reveal>
+      </section>
     </>
   );
 }

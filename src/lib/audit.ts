@@ -20,7 +20,6 @@ export async function audit(entry: AuditEntry) {
       data: {
         userId: entry.userId ?? null,
         action: entry.action,
-        entity: entry.entity,
         entityId: entry.entityId,
         metadata: (entry.metadata as Prisma.InputJsonObject | undefined) ?? undefined,
         ip: entry.ip ?? null,

@@ -12,5 +12,5 @@
       "security": { "noDangerouslySetInnerHtml": "error" }
     }
   },
-  "javascript": { "formatter": { "quoteStyle": "single", "trailingComma": "all" } }
+  "javascript": { "formatter": { "quoteStyle": "single", "trailingCommas": "all" } }
 }

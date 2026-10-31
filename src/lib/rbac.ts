@@ -21,7 +21,7 @@ export async function requireUser() {
   if (!sessionUser?.id) throw new AuthError('UNAUTHENTICATED', 'Sessão inválida');
 
   const user = await prisma.user.findFirst({
-    where: { id: sessionUser.id, deletedAt: null, isActive: true },
+    where: { id: sessionUser.id },
   });
   if (!user) throw new AuthError('UNAUTHENTICATED', 'Conta indisponível');
 

@@ -24,10 +24,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!parsed.success) return null;
 
         const { email, password, totp } = parsed.data;
-        const ip = req?.headers?.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null;
+        const ip = req?.headers?.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '';
 
         const user = await prisma.user.findFirst({
-          where: { email: email.toLowerCase(), deletedAt: null, isActive: true },
+          where: { email: email.toLowerCase() },
         });
 
         if (!user) {
@@ -46,13 +46,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        if (user.mfaEnabled) {
+        if (user.totpEnabled) {
           if (!totp) {
             await audit({ action: 'login.mfa_required', userId: user.id, ip });
             return null;
           }
-          if (!user.totpSecret) return null;
-          const secret = decryptSecret(user.totpSecret);
+          if (!user.totpSecretEnc) return null;
+          const secret = decryptSecret(user.totpSecretEnc);
           if (!verifyTotp(secret, totp)) {
             await audit({
               action: 'login.failure',

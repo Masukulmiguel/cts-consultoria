@@ -46,6 +46,8 @@ Inscrições com pagamento (Fase 7 completa), CRM (Fase 8), analytics, service w
 | Imagens | `gpt-image-2` via OpenAI + assets reais do repo |
 | Slider do header | Ticker de texto no topo + slider de imagens no hero |
 | Deploy | Preparar tudo; deploy bloqueado até resolução do Supabase |
+| Créditos OpenAI | Sem créditos (`insufficient_quota`, verificado 2026-10-29) → o corpus determinístico é o caminho garantido; a camada LLM é opcional e auto-desactivada sem quota |
+| Imagens | Assets reais do repo + arte 3D gerada localmente (SVG/CSS, sem API); imagens IA opcionais quando houver quota |
 
 ## 4. Fundação de design
 
@@ -123,9 +125,25 @@ Um único `<FloatingContact>` (canto inferior direito) abre mini-painel com 3 ac
 
 ## 6. Chatbot
 
-### 6.1 API
+### 6.1 Motor de resposta — dois caminhos
 
-`src/app/api/chat/route.ts` — Route Handler, streaming SSE, modelo `gpt-5-mini` (fallback `gpt-4.1-mini`), `OPENAI_API_KEY` só no servidor.
+O corpus determinístico é **sempre** o caminho funcional. A camada LLM é um **upgrade opcional**.
+
+**Caminho A — motor determinístico (garantido, 0 custo, sem rede)**
+`src/lib/chat/engine.ts` — retrieval híbrido sobre o corpus:
+1. Normaliza a pergunta (lowercase, remove acentos, remove stopwords pt/en).
+2. Pontua cada entrada do corpus por sobreposição de tokens (peso IDF) + match de sinónimos configurados.
+3. Devolve a melhor entrada acima do limiar (`SCORE_THRESHOLD = 0.18`) com a resposta e a(s) fonte(s) (`service:contabilidade-geral`, `faq:inscricoes`).
+4. Abaixo do limiar → resposta honesta: "Não encontrei essa informação nos nossos conteúdos publicados" + atalhos para serviços, formação e contacto.
+
+**Caminho B — camada LLM (opcional, activada só com quota)**
+`src/app/api/chat/route.ts` — Route Handler, streaming SSE, modelo `gpt-5-mini` (fallback `gpt-4o-mini`), `OPENAI_API_KEY` só no servidor.
+- Activação: `OPENAI_API_KEY` presente **e** o último teste de quota não tiver falhado (cache em memória, 10 min).
+- Corpus injectado como documento delimitado; o modelo só responde a partir dele.
+- Se a chamada LLM falhar (429/quota/timeout) → degradação transparente para o Caminho A, com a mesma resposta e as mesmas fontes. O visitante nunca vê erro de quota.
+- A chave nunca chega ao cliente; o modelo é invocado pelo servidor.
+
+**Resposta da API**: `{ answer: string; sources: string[]; mode: 'corpus' | 'llm' | 'fallback' }`. O `mode` é usado só em telemetria interna, nunca apresentado como "IA" ao visitante.
 
 ### 6.2 Corpus autorizado
 
@@ -136,8 +154,8 @@ Um único `<FloatingContact>` (canto inferior direito) abre mini-painel com 3 ac
 - Anti-injection: conteúdo do utilizador nunca entra como instrução; delimitações explícitas + system prompt de "apenas responde a partir do corpus".
 - Proibido revelar dados privados (passwords, tokens, dados de clientes, outras sessões).
 - Rate limit: 20 mensagens / 5 min por hash de IP (reutiliza `src/lib/rate-limit.ts`).
-- Sanitização de PII nas mensagens persistidas.
-- Fallback determinístico: se a IA falhar ou exceder orçamento, responde a partir de FAQs por correspondência lexical.
+- Sanitização de PII nas mensagens persistidas (`src/lib/chat/redact.ts`).
+- Fallback determinístico **é** o Caminho A, não um plano B: o sistema funciona integralmente sem rede.
 
 ### 6.4 UI
 
@@ -172,7 +190,8 @@ Novos roles `STUDENT`, `INSTRUCTOR`. MFA obrigatório apenas para `ADMIN`. Novos
 - `next/image` com `formats: ['image/avif','image/webp']`, `sizes` correctos, `priority` só no primeiro slide.
 - Retrato do CEO (2,1 MB PNG) convertido para AVIF/WebP responsivo.
 - Assets reais aproveitados: `eventos/` (5 fotos), `panfletos/` (12), `parceiros/` (3 logos) — galeria de formação e faixa de parceiros.
-- Imagens geradas por `gpt-image-2`: backgrounds 3D abstractos, uma imagem por secção de serviço, fallback do hero. Prompt em `docs/24-image-prompts.md` para reprodutibilidade.
+- Imagens geradas **localmente** (sem API): fundos 3D abstractos e uma arte por secção de serviço, produzidos como SVG + gradientes CSS com a paleta da marca (técnica `algorithmic-art`, determinística com seed). Ficheiros em `public/brand/backgrounds/`.
+- Imagens por IA (`gpt-image-2`) são **opcionais**: só são usadas quando existir quota; o prompt de cada uma fica em `docs/24-image-prompts.md` para reprodutibilidade. Os slots do hero aceitam ficheiros do utilizador sem alterar código.
 
 ## 9. SEO e metadata
 
@@ -234,8 +253,8 @@ Mapa de equivalência de slugs por locale em `src/content/routes.ts` (`SECTION_B
 |---|---|
 | **Postgres Supabase inacessível** (`db.wwcqditgbpstqcpxtrrk.supabase.co` não resolve em DNS; MCP aponta para `kztglgauxmtuliykeljy`, também inacessível) | Bloqueio de infraestrutura. O utilizador cria/repõe o projecto e actualiza `DATABASE_URL`. Migrations e deploy ficam pendentes até isso. |
 | Imagens do hero pelo utilizador com dimensões/cores inconsistentes | Slots com `aspect-ratio` fixo + overlay ink que uniformiza; fallback IA; validação de ficheiro no script de build. |
-| Custo da API OpenAI | `gpt-5-mini`, `max_tokens` limitado, rate limit, cache de respostas repetidas, aviso de custo no `.env.example`. |
-| Chatbot alucina sobre a empresa | Corpus delimitado + fallback determinístico + prompt de recusa + teste negativo obrigatório (`docs/21` Fase 9). |
+| Custo da API OpenAI | Quota actual = 0 (verificado). O Caminho A (corpus determinístico) é o caminho garantido e cobre 100% das perguntas sobre empresa e formação. O Caminho B é um upgrade automático quando a quota existir. Teste de quota em cache de 10 min evita 429 em loop. |
+| Chatbot alucina sobre a empresa | Caminho A só devolve texto verbatim do corpus, com fontes. Caminho B tem corpus delimitado + prompt de recusa + teste negativo obrigatório (`docs/21` Fase 9). Em caso de falha, degradação para Caminho A. |
 | Peso do bundle com animações | `motion` já instalado; componentes client isolados por secção; sem `framer-motion`. |
 | Vercel sem CLI/token | Deploy prepared (`vercel.json`, `.env.example`), login pelo utilizador via `npx vercel`. |
 

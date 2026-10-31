@@ -1,42 +1,252 @@
 @import "tailwindcss";
 
-/* Tokens de design — cores reais extraídas do logótipo CTS (docs/01 §2.4) */
 @theme {
-  --color-brand-blue: #0054ae;
-  --color-brand-blue-dark: #004299;
-  --color-brand-blue-light: #e8f1fa;
-  --color-brand-red: #e41620;
-  --color-brand-red-dark: #b31219;
+  --color-neutral-50: #f7f9fc;
+  --color-neutral-100: #eef1f6;
+  --color-neutral-200: #e1e6ef;
+  --color-neutral-300: #cbd3e0;
+  --color-neutral-400: #9aa6bc;
+  --color-neutral-500: #6b7794;
+  --color-neutral-600: #4c5872;
+  --color-neutral-700: #37415c;
+  --color-neutral-800: #1f2942;
+  --color-neutral-900: #121a31;
+  --color-neutral-950: #0b1b2f;
+
+  --color-primary-50: #eaf2fb;
+  --color-primary-100: #cfe1f5;
+  --color-primary-200: #a6c8ec;
+  --color-primary-300: #6fa6de;
+  --color-primary-400: #3b81cc;
+  --color-primary-500: #1464b5;
+  --color-primary-600: #0054ae;
+  --color-primary-700: #00469a;
+  --color-primary-800: #00377a;
+  --color-primary-900: #002b5c;
+
+  --color-accent-50: #fde3e4;
+  --color-accent-100: #fbc5c7;
+  --color-accent-200: #f78e92;
+  --color-accent-300: #f2585e;
+  --color-accent-400: #ee3038;
+  --color-accent-500: #e41620;
+  --color-accent-600: #c4121b;
+  --color-accent-700: #9e0f16;
+  --color-accent-800: #7a0c12;
+  --color-accent-900: #5c090d;
+
   --color-ink: #0b1b2f;
-  --color-surface: #f6f8fb;
-  --color-success: #0e7a4f;
+  --color-ink-secondary: #37415c;
+  --color-ink-muted: #5c6880;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f7f9fc;
+  --color-surface-subtle: #eef1f6;
+  --color-border: #e1e6ef;
+  --color-border-strong: #cbd3e0;
+
+  --color-success: #157347;
+  --color-success-bg: #e7f5ee;
   --color-warning: #b45309;
-  --color-danger: #dc2626;
+  --color-warning-bg: #fef3c7;
+  --color-error: #c4121b;
+  --color-error-bg: #fde3e4;
+  --color-info: #0054ae;
+  --color-info-bg: #eaf2fb;
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    sans-serif;
+  --color-whatsapp: #128c7e;
+  --color-whatsapp-bg: #e7f5f2;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 9999px;
+
+  --shadow-xs: 0 1px 2px rgb(11 27 47 / 0.06);
+  --shadow-sm: 0 1px 3px rgb(11 27 47 / 0.08);
+  --shadow-md: 0 4px 12px -2px rgb(11 27 47 / 0.1);
+  --shadow-lg: 0 12px 32px -8px rgb(11 27 47 / 0.16);
+  --shadow-xl: 0 24px 56px -12px rgb(11 27 47 / 0.22);
+
+  --font-display: var(--font-source-serif), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.65;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.5;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 1.35;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 1.25;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 1.2;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1.12;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1.08;
+
+  --ease-cts-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-cts-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  --breakpoint-xs: 26rem;
 }
 
-html {
-  scroll-behavior: smooth;
+:root {
+  --header-height: 116px;
+  --overlay: rgb(11 27 47 / 0.62);
+  --ring-focus: 0 0 0 2px #fff, 0 0 0 4px #0054ae;
+  --ring-focus-dark: 0 0 0 2px #0b1b2f, 0 0 0 4px #6fa6de;
 }
 
-body {
-  @apply bg-white text-ink font-sans antialiased;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-height) + 16px);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-surface font-sans text-ink antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display text-ink;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    @apply bg-primary-600 text-white;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary-600);
+    outline-offset: 2px;
+  }
+
+  .on-dark :focus-visible {
+    outline-color: var(--color-primary-300);
+  }
 }
 
-/* Acessibilidade: respeitar preferência de movimento reduzido */
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold transition duration-200 ease-cts-enter disabled:pointer-events-none disabled:opacity-45;
+}
+
+@layer components {
+  .shell {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10;
+  }
+
+  .section-y {
+    @apply py-16 lg:py-24;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-accent-600;
+  }
+
+  .eyebrow::before {
+    content: "";
+    @apply h-px w-8 bg-accent-500;
+  }
+
+  .heading-xl {
+    @apply font-display text-4xl leading-[1.12] text-ink lg:text-5xl;
+  }
+
+  .heading-lg {
+    @apply font-display text-3xl leading-[1.2] text-ink lg:text-4xl;
+  }
+
+  .heading-md {
+    @apply font-display text-2xl leading-[1.25] text-ink lg:text-3xl;
+  }
+
+  .lede {
+    @apply max-w-[68ch] text-lg leading-relaxed text-ink-secondary;
+  }
+
+  .card {
+    @apply rounded-lg border border-border bg-surface shadow-xs;
+  }
+
+  .card-hover {
+    @apply transition duration-200 ease-cts-enter hover:-translate-y-1 hover:border-primary-200 hover:shadow-lg;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-600 text-white shadow-sm hover:bg-primary-700 hover:shadow-md active:translate-y-px;
+  }
+
+  .btn-accent {
+    @apply btn bg-accent-500 text-white shadow-sm hover:bg-accent-600 hover:shadow-md active:translate-y-px;
+  }
+
+  .btn-outline {
+    @apply btn border border-primary-600 bg-transparent text-primary-700 hover:bg-primary-50;
+  }
+
+  .btn-ghost-dark {
+    @apply btn border border-white/25 bg-white/5 text-white hover:border-white/50 hover:bg-white/10;
+  }
+
+  .btn-outline-dark {
+    @apply btn border border-white/25 bg-transparent text-white hover:border-white/60 hover:bg-white/10;
+  }
+
+  .link-underline {
+    @apply relative inline-flex items-center gap-1 font-semibold text-primary-700 transition-colors hover:text-accent-600;
+  }
+
+  .admin-surface {
+    @apply rounded-xl border border-[#1c2c49] bg-[#0d1729];
+  }
+
+  .admin-surface-2 {
+    @apply rounded-xl border border-[#1c2c49] bg-[#111e35];
+  }
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-brand-blue);
-  outline-offset: 2px;
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }

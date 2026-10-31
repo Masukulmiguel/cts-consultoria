@@ -11,6 +11,7 @@ const prisma = new PrismaClient();
 async function main() {
   const email = process.env.BOOTSTRAP_ADMIN_EMAIL;
   const password = process.env.BOOTSTRAP_ADMIN_PASSWORD;
+  const name = process.env.BOOTSTRAP_ADMIN_NAME ?? 'Superadministrador';
 
   if (!email || !password) {
     console.log('[seed] BOOTSTRAP_ADMIN_EMAIL/PASSWORD não definidos — seed ignorado.');
@@ -20,13 +21,12 @@ async function main() {
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await prisma.user.upsert({
     where: { email },
-    update: { role: 'SUPER_ADMIN', isActive: true },
+    update: { role: 'SUPER_ADMIN', name, passwordHash },
     create: {
       email,
-      name: 'Superadministrador',
+      name,
       passwordHash,
       role: 'SUPER_ADMIN',
-      emailVerifiedAt: new Date(),
     },
   });
   console.log(`[seed] Superadministrador pronto: ${user.email}`);

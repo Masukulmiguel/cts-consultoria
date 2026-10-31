@@ -8,7 +8,8 @@ const { auth: authMiddleware } = NextAuth(authConfig);
 
 export default authMiddleware((req) => {
   const { nextUrl } = req;
-  const isAdmin = nextUrl.pathname.includes('/admin');
+  const isLogin = nextUrl.pathname.endsWith('/admin/login');
+  const isAdmin = nextUrl.pathname.includes('/admin') && !isLogin;
 
   // Protecção de /admin no middleware (primeira linha de defesa).
   // A autorização por papel é re-verificada sempre no servidor (src/lib/rbac.ts).

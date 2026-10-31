@@ -100,7 +100,6 @@ export const anpg = {
 };
 
 export type Service = {
-  number: string;
   slug: { pt: string; en: string };
   title: Localized;
   category: Localized;
@@ -111,7 +110,6 @@ export type Service = {
 /** Serviços reais publicados no website actual (docs/02 §3). */
 export const services: Service[] = [
   {
-    number: 'P.01',
     slug: { pt: 'contabilidade-geral', en: 'general-accounting' },
     title: { pt: 'Contabilidade Geral & Financeira', en: 'General & Financial Accounting' },
     category: { pt: 'Contabilidade', en: 'Accounting' },
@@ -135,7 +133,6 @@ export const services: Service[] = [
     ],
   },
   {
-    number: 'P.02',
     slug: { pt: 'consultoria-fiscal', en: 'tax-consulting' },
     title: { pt: 'Consultoria e Planeamento Fiscal', en: 'Tax Consulting and Planning' },
     category: { pt: 'Fiscalidade', en: 'Tax' },
@@ -159,7 +156,6 @@ export const services: Service[] = [
     ],
   },
   {
-    number: 'P.03',
     slug: { pt: 'erp-primavera', en: 'primavera-erp' },
     title: { pt: 'ERP PRIMAVERA v10', en: 'PRIMAVERA v10 ERP' },
     category: { pt: 'Software ERP', en: 'ERP Software' },
@@ -183,7 +179,6 @@ export const services: Service[] = [
     ],
   },
   {
-    number: 'P.04',
     slug: { pt: 'estudo-de-viabilidade', en: 'feasibility-study' },
     title: {
       pt: 'Estudo de Viabilidade Económica & Financeira',
@@ -210,7 +205,6 @@ export const services: Service[] = [
     ],
   },
   {
-    number: 'P.05',
     slug: { pt: 'auditoria-financeira', en: 'financial-audit' },
     title: {
       pt: 'Auditoria Financeira & Controlo Interno',
@@ -237,7 +231,6 @@ export const services: Service[] = [
     ],
   },
   {
-    number: 'P.06',
     slug: { pt: 'gestao-rh-inss', en: 'hr-inss-management' },
     title: { pt: 'Gestão de RH, Salários & INSS', en: 'HR, Payroll & INSS Management' },
     category: { pt: 'Recursos Humanos', en: 'Human Resources' },

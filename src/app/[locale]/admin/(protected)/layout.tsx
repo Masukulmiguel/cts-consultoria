@@ -1,4 +1,6 @@
-import { auth } from '@/lib/auth';
+import { AdminShell } from '@/components/admin/admin-shell';
+import { ADMIN_NAV } from '@/lib/admin/nav';
+import { signOut } from '@/lib/auth';
 import { AuthError, requireUser } from '@/lib/rbac';
 import { redirect } from 'next/navigation';
 
@@ -11,19 +13,26 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params;
 
-  // O painel é apenas em pt-PT na fase inicial (decisão D2, docs/23).
   if (locale !== 'pt') redirect('/pt/admin');
 
+  let user: Awaited<ReturnType<typeof requireUser>>;
   try {
-    await requireUser();
+    user = await requireUser();
   } catch (err) {
     if (err instanceof AuthError) redirect('/pt/admin/login');
     throw err;
   }
 
-  // Garante que a sessão veio mesmo do Auth.js
-  const session = await auth();
-  if (!session?.user) redirect('/pt/admin/login');
-
-  return <div className="min-h-screen bg-surface">{children}</div>;
+  return (
+    <AdminShell
+      user={{ name: user.name ?? user.email, email: user.email, role: user.role }}
+      groups={ADMIN_NAV}
+      signOutAction={async () => {
+        'use server';
+        await signOut({ redirectTo: '/pt/admin/login' });
+      }}
+    >
+      {children}
+    </AdminShell>
+  );
 }
