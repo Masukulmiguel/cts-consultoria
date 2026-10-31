@@ -1,4 +1,6 @@
 import { ChatbotWidget } from '@/components/chatbot/chatbot-widget';
+import { InstallPrompt } from '@/components/pwa/install-prompt';
+import { ServiceWorkerRegistration } from '@/components/pwa/service-worker-registration';
 import { ScrollProgress } from '@/components/scroll/scroll-progress';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -34,6 +36,8 @@ export default async function PublicLayout({
       </main>
       <SiteFooter locale={safeLocale} />
       <ChatbotWidget locale={safeLocale} />
+      <InstallPrompt locale={safeLocale} />
+      <ServiceWorkerRegistration />
     </div>
   );
 }

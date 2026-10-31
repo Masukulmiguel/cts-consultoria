@@ -205,6 +205,10 @@
     @apply btn border border-primary-600 bg-transparent text-primary-700 hover:bg-primary-50;
   }
 
+  .btn-ghost {
+    @apply btn bg-transparent text-ink-secondary hover:bg-surface-subtle;
+  }
+
   .btn-ghost-dark {
     @apply btn border border-white/25 bg-white/5 text-white hover:border-white/50 hover:bg-white/10;
   }

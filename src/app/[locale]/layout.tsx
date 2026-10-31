@@ -28,6 +28,7 @@ export const viewport: Viewport = {
   themeColor: '#0054ae',
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export async function generateMetadata({
@@ -47,10 +48,17 @@ export async function generateMetadata({
     title: { default: name, template: `%s | ${name}` },
     description,
     applicationName: name,
+    manifest: '/manifest.webmanifest',
+    appleWebApp: {
+      capable: true,
+      title: 'CTS',
+      statusBarStyle: 'black-translucent',
+    },
     icons: {
       icon: [
         { url: '/icons/favicon-32.png', sizes: '32x32', type: 'image/png' },
         { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
       ],
       apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180' }],
     },

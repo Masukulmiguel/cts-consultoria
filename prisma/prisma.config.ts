@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+
 export default {
-  env: '.env',
+  ...(existsSync('.env') ? { env: '.env' } : {}),
 };
