@@ -103,9 +103,15 @@ export function HeroSlider({ locale }: { locale: 'pt' | 'en' }) {
                 aria-hidden={itemIndex !== index}
               >
                 <p className="eyebrow text-accent-300">{item.kicker[locale]}</p>
-                <h1 className="mt-4 bg-gradient-to-r from-white to-white/65 bg-clip-text font-display text-3xl leading-[1.1] font-bold text-transparent sm:mt-5 sm:text-5xl lg:text-6xl">
-                  {item.title[locale]}
-                </h1>
+                {itemIndex === 0 ? (
+                  <h1 className="mt-4 bg-gradient-to-r from-white to-white/65 bg-clip-text font-display text-3xl leading-[1.1] font-bold text-transparent sm:mt-5 sm:text-5xl lg:text-6xl">
+                    {item.title[locale]}
+                  </h1>
+                ) : (
+                  <h2 className="mt-4 bg-gradient-to-r from-white to-white/65 bg-clip-text font-display text-3xl leading-[1.1] font-bold text-transparent sm:mt-5 sm:text-5xl lg:text-6xl">
+                    {item.title[locale]}
+                  </h2>
+                )}
                 <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/80 sm:mt-6 sm:text-lg">
                   {item.text[locale]}
                 </p>
