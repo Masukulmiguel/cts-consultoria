@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.consultoriacts.app",
+      "sha256_cert_fingerprints": [
+        "30BA1099A389DB12C5F3F9B12EF225E8E092779DE90D0718A5C5727B36E497A0"
+      ]
+    }
+  }
+]
