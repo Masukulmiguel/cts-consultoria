@@ -35,6 +35,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import type { ComponentType } from 'react';
 import { useEffect, useRef, useState } from 'react';
@@ -122,9 +123,13 @@ export function AdminShell({ user, groups, children, signOutAction }: AdminShell
   const sidebar = (
     <aside className="flex h-full w-[268px] shrink-0 flex-col border-r border-[#16233d] bg-[#080f1d]">
       <div className="flex items-center gap-3 border-b border-[#16233d] px-5 py-5">
-        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#0054ae] text-sm font-bold text-white">
-          C
-        </span>
+        <Image
+          src="/brand/cts-mark.png"
+          alt="CTS"
+          width={300}
+          height={287}
+          className="h-9 w-auto"
+        />
         <div className="leading-tight">
           <p className="text-sm font-bold text-white">CTS</p>
           <p className="text-[10px] uppercase tracking-[0.14em] text-[#8494b0]">
